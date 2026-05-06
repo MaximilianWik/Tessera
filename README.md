@@ -4,11 +4,17 @@
 
 A web-based QR code generator built for **permanence**. Designed for one specific use case — generating a QR code that will be tattooed and must work for life — but useful for anyone who wants verifiably correct, archival-grade QR codes.
 
-**Live**: deploy to Vercel from this repo (one click — see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
+**Live at <https://tessera-neon.vercel.app/>** · **Source: <https://github.com/MaximilianWik/Tessera>** · **Test page: <https://tessera-neon.vercel.app/tests.html>**
 
 ## About the name
 
 A *tessera* (plural *tesserae*) is one of the small stone or glass tiles set into a mosaic. The Romans floored their villas with them. Byzantine craftsmen tiled the dome of Hagia Sophia with gold-leaf tesserae that have caught the light for fifteen hundred years; the mosaics at Ravenna are nearly as old and still readable.
+
+<p align="center">
+  <img src="hagia_sophia_tessera.jpg" alt="Detail of a Byzantine mosaic in Hagia Sophia, showing how the image is built from thousands of small stone and gold-leaf tesserae." width="640">
+  <br>
+  <em>Detail from the Hagia Sophia mosaics. Each tile is a tessera; the picture only exists because all of them are still there.</em>
+</p>
 
 A QR code is a mosaic. Each module is a tessera; the message is the picture they make together. Fitting name for a mark designed to outlast you — assembled from small tiles, intelligible only when all of them survive in the right places.
 
@@ -79,12 +85,22 @@ The tests include:
 
 ## Deployment
 
-See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Short version:
+The canonical deployment is at <https://tessera-neon.vercel.app/>. To run your own instance:
 
-1. Push this repo to GitHub.
-2. Import the repo in Vercel — no configuration needed; Vercel serves it as a static site.
-3. Connect your custom domain.
-4. CI runs the test fixtures on every push (`.github/workflows/ci.yml`); deploys are gated on those tests passing.
+1. Fork [the repo](https://github.com/MaximilianWik/Tessera) on GitHub.
+2. Import the fork at <https://vercel.com/new>. Vercel auto-detects the static site — leave Framework Preset as "Other" and Build Command / Output Directory blank.
+3. Click Deploy. First deploy takes ~30 seconds.
+4. (Optional) Add a custom domain in Vercel's **Settings → Domains**; it issues a Let's Encrypt cert automatically.
+
+CI runs the full browser test suite on every push (`.github/workflows/ci.yml`); deploys are gated on those tests passing.
+
+### What if Vercel ever goes away?
+
+Tessera is a static site with zero runtime dependencies. The same files work on GitHub Pages, Cloudflare Pages, Netlify, any nginx/Apache/Caddy server — or simply by opening `index.html` from disk. There are no `fetch()` calls or anything else that requires a server. This was an explicit design constraint.
+
+### Domain considerations for a tattoo
+
+If the QR points to a URL on a domain you control, **renew the domain forever**. Set up 10-year renewals with auto-renewal at every registrar that allows it, multiple payment methods on file, and a note in your will / instructions to next-of-kin. If the URL ever 404s, the QR still scans correctly — it just leads nowhere; you can also encode a payload that doesn't depend on a server (e.g. a `mailto:`, plain text, or a data URI — though those have practical limits).
 
 ## Repo layout
 
@@ -96,7 +112,7 @@ tessera/
 ├── src/                    # Encoder, decoders orchestration, UI
 ├── vendor/                 # Vendored decoders (jsQR, zxing-js)
 ├── tests/                  # Test fixtures and runners
-├── docs/                   # PERMANENCE, SPEC, DEPLOYMENT
+├── docs/                   # PERMANENCE, SPEC
 ├── .github/workflows/ci.yml
 ├── package.json            # Dev convenience only — zero runtime deps
 ├── vercel.json
