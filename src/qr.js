@@ -266,6 +266,34 @@
     return null;
   }
 
+  // Find the (version, ecLevel) combination that's optimal for a tattoo:
+  // the smallest version that can hold the data at any EC level, paired with
+  // the highest EC level that fits at that version.
+  //
+  // Why: for tattoos, failure is dominated by blur (ink bleed and edge
+  // softening), not by localized damage. Bigger physical modules survive
+  // blur better than higher EC at smaller modules. So the best strategy is
+  // "smallest grid, then push EC as high as it'll go on that grid", giving
+  // you maximum module size for whatever EC headroom is available.
+  //
+  // Returns { version, ecLevel } or null if the data won't fit anywhere.
+  function findTattooOptimal(text) {
+    var data = utf8Encode(text);
+    var levels = ['H', 'Q', 'M', 'L']; // try highest first at each version
+    for (var v = 1; v <= 40; v++) {
+      for (var i = 0; i < levels.length; i++) {
+        var lev = levels[i];
+        var ecIdx = EC_LEVELS[lev];
+        var capBits = totalDataCodewords(v, ecIdx) * 8;
+        var needBits = 4 + characterCountIndicatorBits(v) + data.length * 8;
+        if (needBits <= capBits) {
+          return { version: v, ecLevel: lev };
+        }
+      }
+    }
+    return null;
+  }
+
   // ---------------------------------------------------------------------------
   // Step 3: Build bit stream
   // ---------------------------------------------------------------------------
@@ -755,6 +783,7 @@
 
   T.QR = {
     encode: encode,
+    findTattooOptimal: findTattooOptimal,
     // Internals (exposed for tests/diagnostics — not part of the stable API):
     _internals: {
       EC_BLOCKS: EC_BLOCKS,

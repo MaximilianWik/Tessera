@@ -122,7 +122,7 @@
   }
 
   function fmtCm(mm)  { return (mm / 10).toFixed(1) + ' cm'; }
-  function fmtMm(mm)  { return mm.toFixed(0) + ' mm'; }
+  function fmtMm(mm)  { return mm.toFixed(1).replace(/\.0$/, '') + ' mm'; }
   function fmtIn(mm)  { return (mm / 25.4).toFixed(2) + ' in'; }
 
   function renderTattooHtml(qr) {

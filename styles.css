@@ -1162,3 +1162,38 @@ button.btn, .btn {
   color: var(--blood-0);
   letter-spacing: 0.05em;
 }
+
+/* -- TATTOO-OPTIMAL CALLOUT (suggestion above the table) ------------------ */
+
+.optimal-callout {
+  background: linear-gradient(90deg, rgba(196, 30, 38, 0.14) 0%, rgba(196, 30, 38, 0.04) 60%, transparent);
+  border: 1px solid var(--blood-2);
+  border-left: 3px solid var(--blood-1);
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+.optimal-callout__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.optimal-callout__head strong {
+  color: var(--bone-0);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+.optimal-callout p {
+  margin: 6px 0 0;
+  color: var(--bone-2);
+  line-height: 1.55;
+}
+.optimal-callout p strong { color: var(--bone-0); }
+
+.btn--small {
+  padding: 6px 12px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}

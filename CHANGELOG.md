@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-05-06
 
+#### Run 6: tattoo-optimal recommendation (fewer modules wins for blur)
+
+The user pointed out (correctly) that fewer modules is generally better for tattoos: physical module size dominates the blur failure mode, and a higher-EC choice that pushes the QR up a version actually makes each module smaller. The default of "always level H" was wrong for the tattoo use case. This run adds a tattoo-aware recommendation that picks the smallest version that fits the data at any EC level, paired with the highest EC at that version, and surfaces it in the tattoo specs panel as a one-click switch.
+
+Added:
+
+- **`Tessera.QR.findTattooOptimal(text)`** in `src/qr.js`. Returns `{ version, ecLevel }` for the smallest version that fits the data at any EC level, with the highest EC at that version. For a 19-byte URL like `http://max-wik.com/`: returns `v2 / Q` (vs the previous default of `v3 / H`), giving 12% bigger modules at the same physical tattoo size in exchange for 5% less algorithmic recovery.
+- **Tattoo-optimal callout** at the top of the tattoo specs panel. Compares the user's current settings to the optimal pair, explains the trade (e.g. "12% bigger modules in exchange for 5% less error correction"), and offers a one-click "Apply" button that switches the EC dropdown and triggers re-encoding.
+- Reasoning copy in the callout: "the dominant failure mode is blur, not localized damage, and bigger modules survive blur far better than higher EC at smaller modules". Backed by a longer paragraph in `permanence.html` Layer IV explaining why physical module size matters more than algorithmic recovery for tattoos (artist's needle has a ~0.3 mm dot resolution; below ~0.7 mm/module the artwork can't be rendered cleanly in the first place).
+
+Changed:
+
+- **EC dropdown copy** in `index.html` reflects the new recommendation: `Q` is labeled "often best for tattoos", `H` is labeled "most algorithmic recovery". The hint text now points at the tattoo specs panel as the place to see the recommendation.
+- **Tattoo status badge** logic: shows `✓ tattoo-optimized` only when the current settings match the optimal pair, and `smaller QR available` when they don't (with the suggestion in the callout).
+- `fmtMm` in both `app.js` and `spec-sheet.js` now formats to one decimal (e.g. `0.7 mm`, `1.2 mm`) instead of rounding to `1 mm` / `1 mm`. The round-to-integer was a copy-paste bug that flattened all three quality grades to "1 mm".
+- New CSS rules in `styles.css`: `.optimal-callout` (the suggestion box with blood-red side bar and gradient backdrop), `.btn--small` (compact button variant for the in-callout Apply button).
+
+Notes:
+
+- The default still encodes at level H (the long-standing convention for "permanence"), but now informs the user when there's a smaller QR they could use, rather than locking them into the larger one. This matches Tessera's broader philosophy: report the trade-offs honestly, let the user pick.
+
 #### Run 5: blur damage model + creator credit + tattoo-optimized recommendations
 
 The damage tolerance system was rebuilt around a model that reflects how tattoos actually fail: gradual ink bleed, not random blot coverage. The hero subtitle was replaced with a stamped creator credit. A new tattoo-recommendations panel teaches users what physical size to ask the artist for. The damage preview and the per-level tolerance log are now a single panel, so the user sees both the live verdict and the full sweep at the same time.
