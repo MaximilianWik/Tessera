@@ -1,6 +1,6 @@
 # tools
 
-Helper scripts. None of these run at site runtime — they're for development and CI only.
+Helper scripts. None of these run at site runtime; they're for development and CI only.
 
 ## `ci-run-tests.mjs`
 
