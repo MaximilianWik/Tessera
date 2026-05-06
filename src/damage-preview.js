@@ -75,6 +75,101 @@
     return (percent / 100) * moduleSize * 3;
   }
 
+  // Detect canvas 2D filter support. iOS Safari < 17 (released Sept 2023) and
+  // some older Android browsers don't support `ctx.filter` — the assignment
+  // silently no-ops and a "blur(...)" filter does nothing, leaving the QR
+  // pristine at every damage level. Detect once at module load and use the
+  // pure-JS box-blur fallback when the property isn't honoured.
+  var HAS_CTX_FILTER = (function () {
+    if (typeof document === 'undefined') return false;
+    try {
+      var c = document.createElement('canvas');
+      c.width = c.height = 1;
+      var ctx = c.getContext('2d');
+      ctx.filter = 'blur(2px)';
+      return ctx.filter === 'blur(2px)';
+    } catch (_) { return false; }
+  })();
+
+  // Sliding-window box blur. O(N) per pass regardless of radius, so safe to
+  // run on mobile at any blur level. Three passes approximate a gaussian
+  // (sigma ~= radius * sqrt(3) for the 3-pass equivalence). For our use case
+  // exact gaussian-equivalence isn't critical: the user just needs the QR
+  // to actually blur and the decoders to see the result.
+  function blurRow(src, dst, w, y, r) {
+    var winLen = 2 * r + 1;
+    var sumR = 0, sumG = 0, sumB = 0, sumA = 0;
+    var i, sx, sidx;
+    for (i = -r; i <= r; i++) {
+      sx = i < 0 ? 0 : (i >= w ? w - 1 : i);
+      sidx = (y * w + sx) * 4;
+      sumR += src[sidx]; sumG += src[sidx + 1]; sumB += src[sidx + 2]; sumA += src[sidx + 3];
+    }
+    var didx, outX, inX, outIdx, inIdx;
+    for (var x = 0; x < w; x++) {
+      didx = (y * w + x) * 4;
+      dst[didx]     = sumR / winLen;
+      dst[didx + 1] = sumG / winLen;
+      dst[didx + 2] = sumB / winLen;
+      dst[didx + 3] = sumA / winLen;
+      outX = x - r; if (outX < 0) outX = 0;
+      inX  = x + r + 1; if (inX > w - 1) inX = w - 1;
+      outIdx = (y * w + outX) * 4;
+      inIdx  = (y * w + inX) * 4;
+      sumR += src[inIdx]     - src[outIdx];
+      sumG += src[inIdx + 1] - src[outIdx + 1];
+      sumB += src[inIdx + 2] - src[outIdx + 2];
+      sumA += src[inIdx + 3] - src[outIdx + 3];
+    }
+  }
+
+  function blurCol(src, dst, w, h, x, r) {
+    var winLen = 2 * r + 1;
+    var sumR = 0, sumG = 0, sumB = 0, sumA = 0;
+    var i, sy, sidx;
+    for (i = -r; i <= r; i++) {
+      sy = i < 0 ? 0 : (i >= h ? h - 1 : i);
+      sidx = (sy * w + x) * 4;
+      sumR += src[sidx]; sumG += src[sidx + 1]; sumB += src[sidx + 2]; sumA += src[sidx + 3];
+    }
+    var didx, outY, inY, outIdx, inIdx;
+    for (var y = 0; y < h; y++) {
+      didx = (y * w + x) * 4;
+      dst[didx]     = sumR / winLen;
+      dst[didx + 1] = sumG / winLen;
+      dst[didx + 2] = sumB / winLen;
+      dst[didx + 3] = sumA / winLen;
+      outY = y - r; if (outY < 0) outY = 0;
+      inY  = y + r + 1; if (inY > h - 1) inY = h - 1;
+      outIdx = (outY * w + x) * 4;
+      inIdx  = (inY * w + x) * 4;
+      sumR += src[inIdx]     - src[outIdx];
+      sumG += src[inIdx + 1] - src[outIdx + 1];
+      sumB += src[inIdx + 2] - src[outIdx + 2];
+      sumA += src[inIdx + 3] - src[outIdx + 3];
+    }
+  }
+
+  function jsBoxBlur(imageData, blurPx) {
+    // Three passes of box blur with radius r approximate a gaussian with
+    // sigma ≈ r. Empirically the box-blur version is harsher on QR decoding
+    // at the same nominal radius than ctx.filter's gaussian, so we apply a
+    // calibration factor of 0.6 to bring mobile (JS path) tolerance results
+    // into rough agreement with desktop (ctx.filter path) results.
+    var radius = Math.max(1, Math.round(blurPx * 0.6));
+    var w = imageData.width;
+    var h = imageData.height;
+    var data = imageData.data;
+    var temp = new Uint8ClampedArray(data.length);
+    for (var pass = 0; pass < 3; pass++) {
+      // Horizontal: data -> temp
+      for (var y = 0; y < h; y++) blurRow(data, temp, w, y, radius);
+      // Vertical: temp -> data
+      for (var x = 0; x < w; x++) blurCol(temp, data, w, h, x, radius);
+    }
+    return imageData;
+  }
+
   function paintQR(ctx, qr, o) {
     var size = qr.size;
     var pxSize = (size + 2 * o.margin) * o.moduleSize;
@@ -111,20 +206,29 @@
       return blurPx;
     }
 
-    // Two-stage paint so the blur convolves a clean image:
-    //   1. Paint the QR onto an offscreen canvas.
-    //   2. Draw it onto the destination with ctx.filter = blur(N).
-    var off = document.createElement('canvas');
-    off.width = pxSize;
-    off.height = pxSize;
-    paintQR(off.getContext('2d'), qr, o);
-
-    // Fill destination white first so blurred edges fade to white not black.
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, pxSize, pxSize);
-    ctx.filter = 'blur(' + blurPx.toFixed(2) + 'px)';
-    ctx.drawImage(off, 0, 0);
-    ctx.filter = 'none';
+    if (HAS_CTX_FILTER) {
+      // Native canvas filter path. Two-stage paint so the blur convolves a
+      // clean image:
+      //   1. Paint the QR onto an offscreen canvas.
+      //   2. Draw it onto the destination with ctx.filter = blur(N).
+      var off = document.createElement('canvas');
+      off.width = pxSize;
+      off.height = pxSize;
+      paintQR(off.getContext('2d'), qr, o);
+      // Fill destination white first so blurred edges fade to white not black.
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, pxSize, pxSize);
+      ctx.filter = 'blur(' + blurPx.toFixed(2) + 'px)';
+      ctx.drawImage(off, 0, 0);
+      ctx.filter = 'none';
+    } else {
+      // Fallback for iOS Safari < 17 and other browsers without canvas filter
+      // support: paint the clean QR, then box-blur the imageData in pure JS.
+      paintQR(ctx, qr, o);
+      var imageData = ctx.getImageData(0, 0, pxSize, pxSize);
+      jsBoxBlur(imageData, blurPx);
+      ctx.putImageData(imageData, 0, 0);
+    }
     return blurPx;
   }
 

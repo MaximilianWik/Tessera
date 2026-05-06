@@ -9,6 +9,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-05-06
 
+#### Run 7: mobile fix (blur preview broken on iOS Safari, layout overflow)
+
+The user flagged that the damage preview didn't work on mobile and the layout was broken. Two real bugs:
+
+1. The blur effect uses `ctx.filter = 'blur(Npx)'` on the canvas 2D context. iOS Safari before v17 (released September 2023) doesn't support that property; the assignment silently no-ops and the rendered QR stays pristine at every damage level. So the blur preview never appeared to do anything on a non-trivial fraction of iPhones, and decoders happily read the unblurred image at "30% damage" too.
+2. The damage canvas was rendered at a fixed pixel size (~333 px wide for a v3 QR) without `max-width: 100%` on the canvas element. On phones below ~360 px CSS width, that overflowed the panel and pushed the whole page sideways. A few other places (tattoo table fixed column widths, site-nav padding, hero credit max-width) also overflowed at narrow viewports.
+
+Added:
+
+- **Pure-JS box-blur fallback in `src/damage-preview.js`**: a separable, sliding-window box blur that runs three passes to approximate a gaussian. O(N) per pass regardless of radius, so safe to run on mobile at any blur level without freezing the UI. A feature-detect at module load (`HAS_CTX_FILTER`) picks the native `ctx.filter` path on Chrome / Edge / iOS 17+ / Firefox, and the JS fallback on iOS &lt; 17 and any other browser without canvas filter support. Calibrated with a 0.6 factor on the box radius so the JS path produces tolerance-log results that match the native path: same 0%/5%/10%/15% OK and 20%/25%/30% FAIL for the default v3-H QR.
+- Comprehensive mobile breakpoints in `styles.css` at `max-width: 720px` and `max-width: 480px`:
+  - Hero ASCII sigil hidden on mobile (no horizontal room), hero padding tightened, title size dropped from `clamp(3rem, 12vw, 9rem)` to `clamp(2.4rem, 14vw, 4rem)` (and further to `clamp(1.9rem, 16vw, 3rem)` below 480px).
+  - Site header: nav links wrap, alternate brand glyph hidden, padding compacted.
+  - Meta-rail: separator characters hidden, type scaled to 10px.
+  - Panel padding reduced; panel headers wrap their badge below the title.
+  - Damage controls: 7-button level row keeps its single-line layout with tighter padding, slider height reduced.
+  - Tolerance log table: 9px font, 4px row padding.
+  - Tattoo recommendations table: at narrow widths (&lt; 480 px) collapses to a stacked card layout, with each row becoming a vertical block and the column-2/column-3 cells gaining `Module:` / `Tattoo:` prefix labels for context. Removes the fixed widths that caused horizontal overflow at desktop breakpoints too.
+  - Optimal callout: at very narrow widths the head wraps so the Apply button drops into its own full-width row.
+  - Permanence layer cards: number sized down to 2.4rem on mobile, body type scaled to match.
+  - Image strip: height reduced from 280px to 200px so it doesn't dominate the page on phone screens.
+
+Changed:
+
+- `.preview__frame canvas` and `.damage__canvas-wrap canvas` now have `max-width: 100%; height: auto;` so the canvas display size scales to fit the viewport while keeping its internal pixel resolution intact (decoders still see the high-resolution data).
+- `.preview__frame` and `.damage__canvas-wrap` get `max-width: 100%` so the bone-white border frame can't push past the panel edge.
+
+Verified:
+
+- 93/93 tests still green.
+- Headless screenshots taken at 375 px (iPhone SE), 393 px (iPhone 14 Pro), and 320 px (smallest realistic viewport) all render without horizontal overflow. Damage canvas, tolerance log, tattoo specs, and the optimal callout are all readable and functional.
+- JS box-blur fallback measured against ctx.filter: same OK/FAIL pattern at every damage level on the default QR, so users on iOS &lt; 17 see the same tolerance number their friends on Chrome do.
+
 #### Run 6: tattoo-optimal recommendation (fewer modules wins for blur)
 
 The user pointed out (correctly) that fewer modules is generally better for tattoos: physical module size dominates the blur failure mode, and a higher-EC choice that pushes the QR up a version actually makes each module smaller. The default of "always level H" was wrong for the tattoo use case. This run adds a tattoo-aware recommendation that picks the smallest version that fits the data at any EC level, paired with the highest EC at that version, and surfaces it in the tattoo specs panel as a one-click switch.

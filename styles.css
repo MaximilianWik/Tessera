@@ -455,11 +455,14 @@ select {
   /* Square corners + inset shadow line in blood */
   box-shadow: 0 0 0 1px var(--ink-0), 0 0 0 3px var(--blood-3);
   display: inline-block;
+  max-width: 100%;
 }
 .preview__frame canvas {
   display: block;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
+  max-width: 100%;
+  height: auto;
 }
 .preview__corners {
   position: absolute;
@@ -608,11 +611,14 @@ select {
   padding: 12px;
   border: var(--thick) solid var(--bone-1);
   box-shadow: 0 0 0 1px var(--ink-0), 0 0 0 3px var(--blood-3);
+  max-width: 100%;
 }
 .damage__canvas-wrap canvas {
   display: block;
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
+  max-width: 100%;
+  height: auto;
 }
 .damage__verdict {
   font-family: var(--font-mono);
@@ -1196,4 +1202,132 @@ button.btn, .btn {
   padding: 6px 12px;
   font-size: 10px;
   letter-spacing: 0.16em;
+}
+
+/* =============================================================================
+   MOBILE: tighten spacing, prevent overflow, scale type down
+   ============================================================================= */
+
+@media (max-width: 720px) {
+  /* Hero: kill the sigil ASCII (not enough horizontal space), tighten
+     padding, drop title size. */
+  .hero { padding: 48px 0 36px; }
+  .hero__sigil { display: none; }
+  .hero__inner { gap: 20px; }
+  .hero__title { font-size: clamp(2.4rem, 14vw, 4rem); }
+  .hero__credit { padding: 12px 14px 12px 16px; max-width: 100%; }
+  .hero__credit-name { font-size: clamp(15px, 4.5vw, 20px); letter-spacing: 0.14em; }
+
+  /* Site header: compact nav, hide alternate brand glyph to free space. */
+  .site-header__inner { padding: 10px 16px; gap: 10px; }
+  .brand a { font-size: 15px; letter-spacing: 0.12em; }
+  .brand .glyph.alt { display: none; }
+  .site-nav { gap: 0; flex-wrap: wrap; justify-content: flex-end; }
+  .site-nav a { padding: 5px 8px; font-size: 9px; letter-spacing: 0.08em; }
+
+  /* Meta rail: vertical separator chars are noisy on mobile, hide them. */
+  .meta-rail { gap: 8px 14px; padding: 12px 0; font-size: 10px; }
+  .meta-rail .sep { display: none; }
+
+  /* Panels: less padding, smaller header type. */
+  .panel { padding: 14px 14px 16px; }
+  .panel__hd { gap: 10px; flex-wrap: wrap; margin-bottom: 12px; padding-bottom: 10px; }
+  .panel__hd h3 { font-size: 10px; letter-spacing: 0.18em; }
+
+  /* Damage panel: tighter buttons + slider. The 7-button row is the worst
+     offender on small phones. */
+  .damage { gap: 18px; }
+  .damage__levels { gap: 3px; }
+  .damage__levels button { font-size: 10px; padding: 6px 0; letter-spacing: 0; }
+  .damage__verdict { padding: 5px 10px; font-size: 10px; letter-spacing: 0.12em; }
+  .damage__readout { font-size: 11px; }
+  .damage__readout .text { font-size: 10px; padding: 6px 8px; }
+
+  /* Tattoo table: drop the fixed widths that caused horizontal overflow. */
+  .tattoo-table th:nth-child(2),
+  .tattoo-table td:nth-child(2) { width: auto; white-space: normal; }
+  .tattoo-table th:last-child,
+  .tattoo-table td:last-child   { width: auto; white-space: normal; }
+  .tattoo-table th, .tattoo-table td { padding: 8px 8px; font-size: 11px; }
+
+  /* Optimal callout: stack head + Apply button vertically on tight screens. */
+  .optimal-callout { padding: 12px 14px; }
+  .optimal-callout__head { gap: 8px; }
+  .optimal-callout__head strong { font-size: 11px; letter-spacing: 0.04em; }
+  .optimal-callout p { font-size: 11px; }
+
+  /* Footer */
+  .site-footer { padding: 32px 16px 24px; margin-top: 40px; }
+  .site-footer__inner { flex-direction: column; gap: 16px; }
+  .site-footer .ascii { font-size: 7px; }
+
+  /* Image strip: shorter on mobile so it doesn't dominate the page. */
+  .image-strip { height: 200px; }
+  .image-strip__caption { padding: 0 16px; }
+
+  /* Permanence layer cards: stack number + body cleanly. */
+  .layer { gap: 10px; padding: 24px 0; }
+  .layer__num { font-size: 2.4rem; }
+  .layer__body table { font-size: 11px; }
+  .layer__body th, .layer__body td { padding: 8px 8px; }
+}
+
+@media (max-width: 480px) {
+  /* Even tighter — the 7-button damage row needs all the space it can get. */
+  .shell { padding: 0 12px; }
+  .panel { padding: 12px; }
+  .hero__title { font-size: clamp(1.9rem, 16vw, 3rem); }
+  .hero__credit-tag, .hero__credit-meta { font-size: 9px; letter-spacing: 0.22em; }
+
+  /* Damage levels: keep 7 cols but very tight padding so they fit. */
+  .damage__levels { gap: 2px; }
+  .damage__levels button { font-size: 9px; padding: 5px 0; }
+  .damage__slider { height: 22px; }
+
+  /* Tolerance log table: compact. */
+  .damage-table th, .damage-table td { padding: 4px 6px; font-size: 10px; }
+
+  /* Tattoo table: stacked layout — each row becomes a card. */
+  .tattoo-table thead { display: none; }
+  .tattoo-table tr {
+    display: block;
+    border-bottom: 1px solid var(--ink-4);
+    padding: 8px 0;
+  }
+  .tattoo-table tr.rec {
+    background: linear-gradient(90deg, rgba(196,30,38,0.16), rgba(196,30,38,0.04) 70%, transparent);
+    padding-left: 10px;
+  }
+  .tattoo-table td {
+    display: block;
+    border: none;
+    padding: 2px 4px;
+  }
+  .tattoo-table td:first-child { padding-bottom: 6px; }
+  .tattoo-table td:nth-child(2)::before {
+    content: "Module: ";
+    color: var(--bone-3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 9px;
+    margin-right: 4px;
+  }
+  .tattoo-table td:last-child::before {
+    content: "Tattoo: ";
+    color: var(--bone-3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 9px;
+    margin-right: 4px;
+  }
+
+  /* Round-trip / verify list: tighter rows. */
+  .check-list li { padding: 6px 8px; font-size: 11px; grid-template-columns: 18px 1fr; }
+
+  /* Optimal callout: drop button into its own row, full-width. */
+  .optimal-callout__head { flex-direction: column; align-items: stretch; }
+  .optimal-callout__head .btn { width: 100%; }
+
+  /* Site footer compact */
+  .site-footer__links { gap: 14px; }
 }
