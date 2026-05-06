@@ -6,6 +6,12 @@ A web-based QR code generator built for **permanence**. Designed for one specifi
 
 **Live**: deploy to Vercel from this repo (one click — see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
+## About the name
+
+A *tessera* (plural *tesserae*) is one of the small stone or glass tiles set into a mosaic. The Romans floored their villas with them. Byzantine craftsmen tiled the dome of Hagia Sophia with gold-leaf tesserae that have caught the light for fifteen hundred years; the mosaics at Ravenna are nearly as old and still readable.
+
+A QR code is a mosaic. Each module is a tessera; the message is the picture they make together. Fitting name for a mark designed to outlast you — assembled from small tiles, intelligible only when all of them survive in the right places.
+
 ## Why does this exist?
 
 Every commercial QR generator I've seen is a black box. You paste a URL, it spits out a PNG, and you're supposed to trust it. That's fine if you're printing it on a flyer that gets thrown away next week. It's not fine if you're going to ink it into your skin.
@@ -14,11 +20,11 @@ Tessera is built so the correctness of every QR it generates can be **verified i
 
 ## How it's permanent
 
-We treat correctness as a multi-layered problem. Every layer must independently verify the QR is sound.
+Correctness is treated as a multi-layered problem. Every layer must independently verify the QR is sound.
 
 1. **The format itself is permanent.** QR is [ISO/IEC 18004](https://www.iso.org/standard/62021.html), with trillions deployed. Every iPhone since iOS 11 (2017) and every Android since 2019 auto-detects QR in the native camera. The standard hasn't changed in ways that affect decoding since 2000. Phones will read QR codes for the rest of your life.
 
-2. **Spec-compliance, mathematically verified.** Our encoder is checked against the **ISO/IEC 18004 Annex I worked example** — the spec's own published test case. Our output must match bit-for-bit. If this passes, our encoder agrees with the standard itself.
+2. **Spec-compliance, mathematically verified.** The encoder is checked against the **ISO/IEC 18004 Annex I worked example** — the spec's own published test case. Tessera's output must match bit-for-bit. If this passes, the encoder agrees with the standard itself.
 
 3. **Round-trip decoding by multiple independent decoders.** Every QR Tessera produces is automatically decoded back to text before you can download it, using:
    - [jsQR](https://github.com/cozmo/jsQR) — popular open-source JS decoder
@@ -102,7 +108,7 @@ tessera/
 ## What Tessera does NOT claim
 
 - It does **not** claim "100% guaranteed forever." Nothing is.
-- It claims: *verified correct against the ISO spec's own test vectors, round-trip-tested by three independent decoders, damage-tolerant to over 25% module loss, and open-source auditable.* That's the strongest honest claim possible — and it's stronger than any commercial QR generator offers.
+- It claims: *verified correct against the ISO spec's own test vectors, round-trip-tested by up to three independent decoders (with the redundancy level recorded), damage-tolerant in a clustered-blot stress test (with the actual measured tolerance recorded for every QR), and open-source auditable.* That's the strongest honest claim possible — and it's stronger than any commercial QR generator offers.
 
 ## License
 

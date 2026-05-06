@@ -2,7 +2,7 @@
 
 Tessera is built on the assumption that a QR code generator's output may need to remain decodable for **decades**. For a QR code being tattooed onto skin, "good enough" isn't.
 
-We treat correctness as a multi-layered problem. The QR is only released for download once **every layer agrees** it's sound. Failure requires *all* layers to fail simultaneously — engineering-equivalent to impossible.
+Correctness is treated as a multi-layered problem. The QR is only released for download once **every layer agrees** it's sound. Failure requires *all* layers to fail simultaneously — engineering-equivalent to impossible.
 
 ## Layer 1 — The format itself is permanent
 
@@ -32,11 +32,11 @@ The Annex I example encodes the alphanumeric string `"01234567"` as a 1-M QR cod
 
 Tessera's `tests/test-iso-vector.js` checks **every intermediate step**, not just the final matrix. If any stage diverges from the spec, the test fails loudly and the deploy is blocked.
 
-> Note: an earlier draft of this project planned to additionally cross-check against `qrencode` and `python-qrcode` reference implementations. We dropped that comparison after determining that the ISO Annex I vector is *the* canonical test, and that round-trip decoding by three independent decoders (Layer 3) provides equivalent cross-implementation evidence with stronger guarantees (those decoders are what *actually* read the QR — that's what matters for a tattoo).
+> Note: an earlier draft of this project planned to additionally cross-check against `qrencode` and `python-qrcode` reference implementations. That comparison was dropped after determining that the ISO Annex I vector is *the* canonical test, and that round-trip decoding by three independent decoders (Layer 3) provides equivalent cross-implementation evidence with stronger guarantees (those decoders are what *actually* read the QR — that's what matters for a tattoo).
 
 ## Layer 3 — Round-trip decoding by multiple independent decoders
 
-Every QR Tessera produces is **decoded back to text** before the download buttons enable. We use three independent decoders:
+Every QR Tessera produces is **decoded back to text** before the download buttons enable. Three independent decoders are used:
 
 | Decoder | Origin | Why it matters |
 |---|---|---|
@@ -46,9 +46,9 @@ Every QR Tessera produces is **decoded back to text** before the download button
 
 Three independent codebases, three independent algorithmic traditions. Verification passes iff:
 1. **At least one decoder successfully decoded** the QR (else nothing actually read it back, so the QR isn't *verified* — it just exists).
-2. **Every decoder that succeeded returned the exact original input text** (silent mismatches are the dangerous failure mode — that's an encoder bug producing a "valid-looking but wrong" QR, and we fail verification immediately if any decoder reports a mismatch).
+2. **Every decoder that succeeded returned the exact original input text** (silent mismatches are the dangerous failure mode — that's an encoder bug producing a "valid-looking but wrong" QR, and verification fails immediately if any decoder reports a mismatch).
 
-The UI separately reports the **redundancy level** — how many decoders agreed (1, 2, or 3). When `BarcodeDetector` is available (Chrome/Edge desktop, Safari iOS 17+) and zxing-js doesn't trip on its own quirks, you'll see redundancy = 3, which is the strongest cross-check. In headless CI environments or older browsers, redundancy may be 1–2; that's still a passing verification, just with a more visible cross-check footprint shown in the readout. We chose this rule rather than "all decoders must succeed" because zxing-js (port of the canonical Google ZXing — used by Android ML Kit) has known quirks on small computer-rendered QRs that have nothing to do with our encoder; if jsQR + native both agree, that's already strong evidence of correctness.
+The UI separately reports the **redundancy level** — how many decoders agreed (1, 2, or 3). When `BarcodeDetector` is available (Chrome/Edge desktop, Safari iOS 17+) and zxing-js doesn't trip on its own quirks, redundancy = 3, the strongest cross-check. In headless CI environments or older browsers, redundancy may be 1–2; that's still a passing verification, just with a more visible cross-check footprint shown in the readout. The reason this rule was chosen rather than "all decoders must succeed": zxing-js (port of the canonical Google ZXing — used by Android ML Kit) has known quirks on small computer-rendered QRs that have nothing to do with this encoder; if jsQR + native both agree, that's already strong evidence of correctness.
 
 `BarcodeDetector` availability varies by browser; when it's not available, Tessera proceeds with jsQR + zxing-js (and clearly indicates this in the verification readout).
 
@@ -56,7 +56,7 @@ The UI separately reports the **redundancy level** — how many decoders agreed 
 
 A QR with EC level H is specified to recover from up to **30% module corruption**, but with an important caveat: that 30% number applies to **idealized clustering** aligned with codeword boundaries. Reed–Solomon corrects up to half the EC codewords *per block*. Random module flips at, say, 5% spread across many distinct codewords easily exceed the per-block correction budget — even though the *total* fraction of damaged modules is far below 30%. Clustered damage flips many bits within a few codewords, which RS handles gracefully — but only if the cluster lands within a single block.
 
-This is a feature, not a bug — it's how QR codes actually fail in the field. Real-world damage is **always** clustered: a scratch, a sticker, ink fade in one region, sun damage on one side, a cover-up tattoo over a corner. So we test the realistic damage model:
+This is a feature, not a bug — it's how QR codes actually fail in the field. Real-world damage is **always** clustered: a scratch, a sticker, ink fade in one region, sun damage on one side, a cover-up tattoo over a corner. So the test simulates the realistic damage model:
 
 1. Take the rendered QR matrix.
 2. Place a square "blot" centred at a random position, sized to cover approximately N% of the total module area. Flip every data module within. (Function patterns are not corrupted — see note below.)
@@ -64,11 +64,11 @@ This is a feature, not a bug — it's how QR codes actually fail in the field. R
 4. Repeat at 5%, 10%, 15%, 20%, 25%, 30% damage levels, with 5 trials per level (deterministic seed for reproducibility).
 5. Record the highest damage level at which **all** trials still decode correctly.
 
-The **permanence bar** is **5% clustered damage tolerated reliably** (100% pass rate across 5 random blot positions) — the empirical floor that's reproducible across all QR sizes we tested. Larger QRs (v6+) typically tolerate considerably more — 15–25% or higher. We picked 5% as the headline because the original plan's 25% claim, while consistent with the ISO spec on paper, doesn't reliably hold up under randomized blot positioning. The reason: codeword interleaving across RS blocks means a blot damages multiple blocks roughly equally, so each block's per-block correction budget is exceeded at far less than 30% module loss. Quoting a higher number would be dishonest about what the test actually measures.
+The **permanence bar** is **5% clustered damage tolerated reliably** (100% pass rate across 5 random blot positions) — the empirical floor that's reproducible across every QR size tested. Larger QRs (v6+) typically tolerate considerably more — 15–25% or higher. 5% was picked as the headline because the original plan's 25% claim, while consistent with the ISO spec on paper, doesn't reliably hold up under randomized blot positioning. The reason: codeword interleaving across RS blocks means a blot damages multiple blocks roughly equally, so each block's per-block correction budget is exceeded at far less than 30% module loss. Quoting a higher number would be dishonest about what the test actually measures.
 
-Importantly, the actual measured tolerance for *your* QR is shown in the UI and recorded on the spec sheet — so if your input pushes the QR up to v6 or v10, you'll see and record a much higher tolerance number. The 5% bar is just the floor below which we don't ship.
+Importantly, the actual measured tolerance for *your* QR is shown in the UI and recorded on the spec sheet — so if your input pushes the QR up to v6 or v10, you'll see and record a much higher tolerance number. The 5% bar is just the floor below which Tessera won't ship.
 
-> Why we don't damage finders. The three finder patterns and the timing rows are not part of the data area and are *not* covered by the Reed–Solomon error-correction budget. They're what the decoder uses to *locate* the QR in the first place. If they're badly damaged, the decoder gives up before it even tries to read data. In practice a tattoo with a damaged finder is basically unreadable on any phone — there's no recovery path. We exclude them from the damage simulation because corrupting them tests detection (which has no spec-promised recovery), not error correction (which does). Real-world tattoo damage that makes a QR unreadable almost always comes from finder-pattern damage, not data-module damage — keep the finders pristine.
+> Why finders aren't damaged. The three finder patterns and the timing rows are not part of the data area and are *not* covered by the Reed–Solomon error-correction budget. They're what the decoder uses to *locate* the QR in the first place. If they're badly damaged, the decoder gives up before it even tries to read data. In practice a tattoo with a damaged finder is basically unreadable on any phone — there's no recovery path. The damage simulation excludes them because corrupting them tests detection (which has no spec-promised recovery), not error correction (which does). Real-world tattoo damage that makes a QR unreadable almost always comes from finder-pattern damage, not data-module damage — keep the finders pristine.
 
 Real-world tattoo failure modes — ink spread, fading, partial cover-up — usually correspond to clustered damage covering far less than 10% of the module area. A QR that survives 10% clustered corruption will almost certainly survive normal aging.
 
@@ -105,10 +105,10 @@ The repo is public. Anyone can:
 
 The correctness of your tattoo is **publicly verifiable forever**.
 
-## What we don't claim
+## What this project doesn't claim
 
-We do **not** claim "100% guaranteed correct forever." That claim is unfalsifiable and unscientific. We claim:
+Tessera does **not** claim "100% guaranteed correct forever." That claim is unfalsifiable and unscientific. The actual claim:
 
-> Verified correct against the ISO/IEC 18004 spec's own test vector, round-trip-tested by three independent decoders, damage-tolerant to over 25% module loss, and open-source auditable.
+> Verified correct against the ISO/IEC 18004 spec's own test vector, round-trip-tested by up to three independent decoders (with the redundancy level recorded), damage-tolerant in a clustered-blot stress test (with the actual measured tolerance recorded for every QR), and open-source auditable.
 
 That is the strongest honest claim possible. It is stronger than any commercial QR generator offers.

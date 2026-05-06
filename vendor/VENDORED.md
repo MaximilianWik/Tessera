@@ -26,7 +26,7 @@ This directory holds **committed copies** of the two third-party QR decoders Tes
 - **Usage**: `new ZXing.QRCodeReader().decode(new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(new ZXing.RGBLuminanceSource(...))))`
 
 ### Native `BarcodeDetector`
-A third decoder is used when available: the browser's built-in [`BarcodeDetector`](https://developer.mozilla.org/en-US/docs/Web/API/BarcodeDetector). On Chrome and Edge this calls the **OS-level decoder** — the same code iPhones and Androids use in the camera app. There's nothing to vendor here; we just feature-detect at runtime.
+A third decoder is used when available: the browser's built-in [`BarcodeDetector`](https://developer.mozilla.org/en-US/docs/Web/API/BarcodeDetector). On Chrome and Edge this calls the **OS-level decoder** — the same code iPhones and Androids use in the camera app. There's nothing to vendor here; the runtime feature-detects it.
 
 ## Verifying authenticity
 
