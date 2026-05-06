@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-05-06
 
+#### Run 8: blur-detection bug fix (iOS Safari < 17 silently no-ops ctx.filter)
+
+Run 7's mobile fix added a JS box-blur fallback for browsers without canvas filter support, gated on a `HAS_CTX_FILTER` detection. The detection had a subtle bug: it set `ctx.filter = 'blur(2px)'` and then read it back, expecting browsers without filter support to either throw or return a different value. iOS Safari before v17 does neither — assigning to a non-existent property silently creates a regular JS property on the context object, so reading it back returns the value that was set, the equality test passes, Tessera concludes filter is supported, takes the native path, and the blur silently does nothing. The user's "still doesn't work on mobile" report.
+
+Changed:
+
+- **`HAS_CTX_FILTER` detection** in `src/damage-preview.js` rewritten as a *functional* pixel test instead of a property-readback test. Paints a small white square on a black canvas via `drawImage` with `ctx.filter = 'blur(2px)'`, then reads back a pixel just outside the square. If blur worked, that pixel is gray (gaussian spread reached it); if blur silently no-opped, it's pure black. Also adds a prototype-presence check upfront (`'filter' in CanvasRenderingContext2D.prototype`) so the common no-prototype case fails fast without the canvas test.
+
+Verified:
+
+- Headless Chrome with normal `ctx.filter`: detection returns true (pixel test reads non-zero), native path selected. Same as desktop today.
+- Headless Chrome with `ctx.filter` stubbed to no-op (simulating iOS Safari 16): detection returns false, JS box-blur fallback runs, blur actually applies — verified by ~190 000 pixels changed between 0% and 30% blur on the rendered canvas.
+- 93/93 tests still green. Mobile-screenshot regression check at 375 px wide unchanged from run 7.
+
 #### Run 7: mobile fix (blur preview broken on iOS Safari, layout overflow)
 
 The user flagged that the damage preview didn't work on mobile and the layout was broken. Two real bugs:
