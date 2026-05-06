@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-05-06
 
+#### Run 4: Vercel deployment fix (404 NOT_FOUND on root URL)
+
+The cyber-sigilism overhaul (run 3) created a `public/` directory full of imagery. After deploying to Vercel, the root URL started returning `404: NOT_FOUND` (Vercel error ID `arn1::drlxn-...`). The cause: Vercel's framework auto-detection treats a `public/` directory as the build output of a Next.js / CRA / similar SPA project, so it tried to serve `index.html` from inside `public/` (where it doesn't exist) instead of from the repo root (where it does).
+
+Changed:
+
+- Renamed `tessera/public/` to `tessera/assets/`. The directory name was the entire problem; `assets/` is not a reserved name in any framework auto-detector.
+- Updated all imagery references accordingly: `index.html` (preload + hero bg + image strip), `tests.html` (hero bg), `permanence.html` (hero bg + two image strips). All six sigil paths verified to resolve.
+- `vercel.json` made explicit so a future fork can't trip the same wire: `framework: null`, `buildCommand: null`, `outputDirectory: "."`, `installCommand: null`. Same `cleanUrls`, `trailingSlash`, and headers as before; just adds the explicit overrides that disable framework auto-detection.
+
 #### Run 3: cyber-sigilism overhaul + interactive damage preview
 
 Added:
