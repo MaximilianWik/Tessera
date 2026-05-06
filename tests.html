@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tessera — test suite</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .test-page { max-width: 1000px; margin: 0 auto; padding: 24px 32px; }
+    .run-bar { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
+    #run-status { color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <h1>Tessera — test suite</h1>
+      <p class="tagline">If this page is green, the deployed code passes its own tests.</p>
+    </div>
+    <nav>
+      <a href="index.html">App</a>
+      <a href="docs/PERMANENCE.md">How it's permanent</a>
+      <a href="https://github.com/USER/tessera" rel="noopener">Source</a>
+    </nav>
+  </header>
+
+  <main class="test-page">
+    <div class="run-bar">
+      <button id="run">Run all tests</button>
+      <span id="run-status">Click to run</span>
+    </div>
+    <div id="results" class="test-results"></div>
+  </main>
+
+  <!-- Vendored decoders -->
+  <script src="vendor/jsqr.js"></script>
+  <script src="vendor/zxing.js"></script>
+
+  <!-- Tessera modules -->
+  <script src="src/reed-solomon.js"></script>
+  <script src="src/qr.js"></script>
+  <script src="src/png.js"></script>
+  <script src="src/svg.js"></script>
+  <script src="src/verify.js"></script>
+  <script src="src/damage.js"></script>
+  <script src="src/spec-sheet.js"></script>
+
+  <!-- Test framework -->
+  <script src="tests/runner.js"></script>
+
+  <!-- Test suites — they self-register into window.__tesseraTestSuites -->
+  <script src="tests/test-iso-vector.js"></script>
+  <script src="tests/test-roundtrip.js"></script>
+  <script src="tests/test-damage.js"></script>
+
+  <script>
+    (function () {
+      'use strict';
+      var btn = document.getElementById('run');
+      var status = document.getElementById('run-status');
+      var resultsEl = document.getElementById('results');
+
+      btn.addEventListener('click', function () {
+        btn.disabled = true;
+        status.textContent = 'Running…';
+        var runner = new Tessera.TestRunner(resultsEl);
+        (window.__tesseraTestSuites || []).forEach(function (registerFn) {
+          registerFn(runner);
+        });
+        var startedAt = performance.now();
+        runner.run().then(function (totals) {
+          var ms = (performance.now() - startedAt).toFixed(0);
+          status.textContent = totals.failed === 0
+            ? '✓ ' + totals.passed + ' passed, ' + totals.skipped + ' skipped (' + ms + ' ms)'
+            : '✗ ' + totals.failed + ' failed, ' + totals.passed + ' passed (' + ms + ' ms)';
+          btn.disabled = false;
+        }, function (err) {
+          status.textContent = 'Runner error: ' + err.message;
+          btn.disabled = false;
+        });
+      });
+
+      // Auto-run on page load (the page is the test, after all)
+      btn.click();
+    })();
+  </script>
+</body>
+</html>
