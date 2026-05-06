@@ -75,20 +75,47 @@
     return (percent / 100) * moduleSize * 3;
   }
 
-  // Detect canvas 2D filter support. iOS Safari < 17 (released Sept 2023) and
-  // some older Android browsers don't support `ctx.filter` — the assignment
-  // silently no-ops and a "blur(...)" filter does nothing, leaving the QR
-  // pristine at every damage level. Detect once at module load and use the
-  // pure-JS box-blur fallback when the property isn't honoured.
+  // Detect canvas 2D filter support — robustly. iOS Safari < 17 (released
+  // Sept 2023) doesn't implement `ctx.filter`, but setting it still succeeds
+  // (it just creates a normal JS property on the context object), so a naive
+  // `ctx.filter = 'blur(2px)'; return ctx.filter === 'blur(2px)'` test passes
+  // even though the filter never actually applies. We need to FUNCTIONALLY
+  // verify that drawing with a blur filter changes the resulting pixels.
+  //
+  // The test: paint a small white square on a black canvas via drawImage with
+  // ctx.filter = 'blur(2px)'. If blur worked, pixels just outside the square
+  // pick up some gray from the spread. If blur silently no-opped, those
+  // pixels stay pure black.
   var HAS_CTX_FILTER = (function () {
     if (typeof document === 'undefined') return false;
     try {
+      // First-line check: is `filter` even on the prototype? (Catches iOS 16.)
+      if (typeof CanvasRenderingContext2D !== 'undefined'
+          && !('filter' in CanvasRenderingContext2D.prototype)) {
+        return false;
+      }
       var c = document.createElement('canvas');
-      c.width = c.height = 1;
+      c.width = c.height = 8;
       var ctx = c.getContext('2d');
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, 8, 8);
+      var off = document.createElement('canvas');
+      off.width = off.height = 8;
+      var offCtx = off.getContext('2d');
+      offCtx.fillStyle = '#ffffff';
+      offCtx.fillRect(2, 2, 4, 4); // 4×4 white square centered in 8×8
       ctx.filter = 'blur(2px)';
-      return ctx.filter === 'blur(2px)';
-    } catch (_) { return false; }
+      ctx.drawImage(off, 0, 0);
+      ctx.filter = 'none';
+      // Pixel at (1, 1) is just outside the white square. With blur applied,
+      // gaussian spread from the square reaches it; without blur, it stays
+      // black (drawImage of an offscreen with no fill at (1,1) is transparent
+      // over the existing black main canvas → black).
+      var pixel = ctx.getImageData(1, 1, 1, 1).data;
+      return pixel[0] > 0;
+    } catch (e) {
+      return false;
+    }
   })();
 
   // Sliding-window box blur. O(N) per pass regardless of radius, so safe to
