@@ -4,99 +4,226 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Verified-permanent QR code generator. Built for codes that must work for life.">
-  <title>Tessera — verified-permanent QR codes</title>
+  <title>TESSERA · verified-permanent QR codes</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="preload" as="image" href="public/sigil-01.jpg">
 </head>
-<body>
+<body data-page="landing">
+
   <header class="site-header">
-    <div class="brand">
-      <h1>Tessera</h1>
-      <p class="tagline">Permanent tiles for a permanent mark.</p>
+    <div class="site-header__inner">
+      <div class="brand">
+        <span class="glyph"></span>
+        <span class="glyph alt"></span>
+        <a href="index.html">TESSERA</a>
+      </div>
+      <nav class="site-nav">
+        <a href="index.html" class="active">Generator</a>
+        <a href="permanence.html">Permanence</a>
+        <a href="tests.html">Diagnostics</a>
+        <a href="https://github.com/MaximilianWik/Tessera" rel="noopener">Source</a>
+      </nav>
     </div>
-    <nav>
-      <a href="tests.html">Tests</a>
-      <a href="docs/PERMANENCE.md">How it's permanent</a>
-      <a href="https://github.com/MaximilianWik/Tessera" rel="noopener">Source</a>
-    </nav>
   </header>
 
-  <main class="layout">
-    <section class="panel input-panel">
-      <h2>Input</h2>
-      <label class="field">
-        <span class="field-label">Text or URL</span>
-        <textarea id="input-text" rows="3" autofocus spellcheck="false" autocorrect="off" autocapitalize="off">https://example.com</textarea>
-        <span class="field-hint"><span id="char-count">0</span> chars · <span id="byte-count">0</span> UTF-8 bytes</span>
-      </label>
-      <label class="field">
-        <span class="field-label">Error correction</span>
-        <select id="ec-level">
-          <option value="L">L — recovers ~7%</option>
-          <option value="M">M — recovers ~15%</option>
-          <option value="Q">Q — recovers ~25%</option>
-          <option value="H" selected>H — recovers ~30% (recommended)</option>
-        </select>
-        <span class="field-hint">H is the most damage-resistant. Recommended for permanent ink.</span>
-      </label>
-      <p id="error" class="error" hidden></p>
-    </section>
-
-    <section class="panel preview-panel">
-      <h2>Preview <span id="status-badge" data-state="idle">Enter text</span></h2>
-      <div id="preview-wrap" class="preview-wrap" hidden>
-        <canvas id="preview-canvas"></canvas>
+  <section class="hero">
+    <div class="hero__bg" style="background-image: url('public/sigil-01.jpg');"></div>
+    <div class="shell hero__inner">
+      <div>
+        <h1 class="hero__title">TESS<span class="accent">/</span>ERA</h1>
+        <p class="hero__sub">Permanent tiles for a permanent mark. A QR generator for codes that must work for life. Verified, decoded, stress-tested before you can download.</p>
       </div>
-      <dl class="meta-grid">
-        <dt>Version</dt><dd id="meta-version">—</dd>
-        <dt>Size</dt><dd id="meta-size">—</dd>
-        <dt>EC level</dt><dd id="meta-ec">—</dd>
-        <dt>Mask</dt><dd id="meta-mask">—</dd>
-      </dl>
-    </section>
+      <pre class="hero__sigil" aria-hidden="true">
+       ▓▓▓▓▓▓▓▓▓
+       ▓ ▒ █ ▒ ▓
+       ▒ █ ✕ █ ▒
+       ▓ ▒ █ ▒ ▓
+       ▓▓▓▓▓▓▓▓▓
+           │
+       ░▒▓ ▼ ▓▒░
+       ▓ V O W ▓
+       ▓ I N K ▓
+       ▓ T I L ▓
+       ▓ E V R ▓
+       ░▒▓ █ ▓▒░</pre>
+    </div>
+  </section>
 
-    <section class="panel verify-panel">
-      <h2>Round-trip verification</h2>
-      <p class="muted small">The QR is decoded back to text by every available decoder. Downloads stay disabled until every decoder agrees.</p>
-      <ul id="verify-list" class="check-list"></ul>
-    </section>
+  <div class="shell">
+    <div class="meta-rail">
+      <span><strong>ISO/IEC 18004</strong> compliant</span>
+      <span class="sep">▓</span>
+      <span>byte mode · all 40 versions · masks 0 to 7</span>
+      <span class="sep">▓</span>
+      <span>vendored: <strong>jsQR 1.4.0</strong> · <strong>zxing-js 0.21.3</strong> · native</span>
+      <span class="sep">▓</span>
+      <span>93 tests · zero runtime deps</span>
+    </div>
 
-    <section class="panel damage-panel">
-      <h2>Damage tolerance</h2>
-      <p class="muted small">A square blot covering 5–30% of the QR's module area. Models real-world clustered damage (scratch, fade, cover-up). Bar is 5%; larger QRs typically handle much more.</p>
-      <div id="damage-out"></div>
-    </section>
+    <main class="app-grid">
 
-    <section class="panel export-panel">
-      <h2>Export</h2>
-      <p class="muted small">Disabled until verification passes.</p>
-      <div class="button-row">
-        <button id="btn-png" type="button">Download PNG</button>
-        <button id="btn-svg" type="button">Download SVG</button>
-        <button id="btn-sheet" type="button">Open spec sheet</button>
-      </div>
-      <p class="muted small">The spec sheet is a printable archival document — print it and file it with important papers.</p>
-    </section>
-  </main>
+      <!-- INPUT --------------------------------------------------------- -->
+      <section class="panel span-2">
+        <div class="panel__hd">
+          <h3><span class="num">I.</span> &nbsp; Input</h3>
+          <span class="muted small">UTF-8 · any payload</span>
+        </div>
+        <div class="field">
+          <label class="field-label" for="input-text">Text or URL</label>
+          <textarea id="input-text" rows="2" autofocus spellcheck="false" autocorrect="off" autocapitalize="off">https://example.com</textarea>
+          <span class="field-hint"><span id="char-count">0</span> chars · <span id="byte-count">0</span> UTF-8 bytes</span>
+        </div>
+        <div class="field" style="max-width: 380px;">
+          <label class="field-label" for="ec-level">Error correction</label>
+          <select id="ec-level">
+            <option value="L">L · recovers ~7%</option>
+            <option value="M">M · recovers ~15%</option>
+            <option value="Q">Q · recovers ~25%</option>
+            <option value="H" selected>H · recovers ~30% (recommended)</option>
+          </select>
+          <span class="field-hint">H is the most damage-resistant. Use it for permanent ink.</span>
+        </div>
+        <p id="error" class="error" hidden></p>
+      </section>
+
+      <!-- PREVIEW + METADATA ------------------------------------------- -->
+      <section class="panel">
+        <div class="panel__hd">
+          <h3><span class="num">II.</span> &nbsp; Output</h3>
+          <span id="status-badge" class="badge" data-state="idle">Enter text</span>
+        </div>
+        <div id="preview-wrap" class="preview" hidden>
+          <div class="preview__frame">
+            <div class="preview__corners"></div>
+            <canvas id="preview-canvas"></canvas>
+          </div>
+        </div>
+        <dl class="meta-grid mt-6">
+          <dt>Version</dt><dd id="meta-version">·</dd>
+          <dt>Size</dt><dd id="meta-size">·</dd>
+          <dt>EC level</dt><dd id="meta-ec">·</dd>
+          <dt>Mask</dt><dd id="meta-mask">·</dd>
+        </dl>
+      </section>
+
+      <!-- ROUND-TRIP VERIFICATION -------------------------------------- -->
+      <section class="panel">
+        <div class="panel__hd">
+          <h3><span class="num">III.</span> &nbsp; Round-trip</h3>
+          <span class="muted small">decoded back to text</span>
+        </div>
+        <p class="panel__hint">Every QR is decoded by every available decoder. Downloads stay locked unless every decoder that read it agrees on the exact input.</p>
+        <ul id="verify-list" class="check-list"></ul>
+      </section>
+
+      <!-- DAMAGE PREVIEW (NEW, FEATURED) ------------------------------- -->
+      <section class="panel panel--blood span-2">
+        <div class="panel__hd">
+          <h3><span class="num">IV.</span> &nbsp; Damage preview</h3>
+          <span id="damage-verdict" class="damage__verdict" data-state="idle">·</span>
+        </div>
+        <p class="panel__hint">A square blot is dropped on the QR at the chosen size. Watch how much it can lose and still scan. Larger QRs survive more.</p>
+        <div class="damage">
+          <div class="damage__stage">
+            <div id="damage-canvas-wrap" class="damage__canvas-wrap" hidden>
+              <canvas id="damage-canvas"></canvas>
+            </div>
+            <div class="damage__readout" id="damage-readout">
+              <div><strong>Damage:</strong> <span id="damage-pct">0%</span> · <span id="damage-status">awaiting input</span></div>
+              <div class="text" id="damage-decoded">·</div>
+            </div>
+          </div>
+          <div class="damage__controls">
+            <label class="field-label" for="damage-slider">Damage level</label>
+            <div class="damage__levels" id="damage-levels">
+              <button type="button" data-level="0">0%</button>
+              <button type="button" data-level="5" class="active">5%</button>
+              <button type="button" data-level="10">10%</button>
+              <button type="button" data-level="15">15%</button>
+              <button type="button" data-level="20">20%</button>
+              <button type="button" data-level="25">25%</button>
+              <button type="button" data-level="30">30%</button>
+            </div>
+            <input id="damage-slider" class="damage__slider" type="range" min="0" max="30" step="1" value="5">
+            <p class="muted small mt-2">5% is the universal floor across QR sizes. Real-world tattoo damage (fade, cover-up, scratch) is rarely more than 10 to 15% of a properly sized code. Drag slowly to watch the verdict flip.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- DAMAGE STATS + EXPORT --------------------------------------- -->
+      <section class="panel">
+        <div class="panel__hd">
+          <h3><span class="num">V.</span> &nbsp; Tolerance log</h3>
+          <span class="muted small">pass-rate per level</span>
+        </div>
+        <p class="panel__hint">Five trials per level, each at a fresh random blot position. Reported, not gated.</p>
+        <div id="damage-out"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__hd">
+          <h3><span class="num">VI.</span> &nbsp; Export</h3>
+          <span class="muted small">locks until verified</span>
+        </div>
+        <p class="panel__hint">PNG for the artist's screen. SVG for any size. Spec sheet for the archive (print and file with important documents).</p>
+        <div class="button-row">
+          <button id="btn-png" type="button" class="btn">PNG</button>
+          <button id="btn-svg" type="button" class="btn">SVG</button>
+          <button id="btn-sheet" type="button" class="btn btn--primary">Spec sheet</button>
+        </div>
+      </section>
+
+    </main>
+
+    <div class="rule" aria-hidden="true"></div>
+  </div>
+
+  <!-- IMAGE STRIP (atmospheric, sigil imagery) ------------------------- -->
+  <aside class="image-strip" aria-hidden="false">
+    <div class="image-strip__bg" style="background-image: url('public/sigil-04.jpg');"></div>
+    <div class="image-strip__overlay"></div>
+    <div class="shell image-strip__caption">
+      <blockquote>
+        Each module is a tessera. Tile by tile, the message survives only because every one of them does.
+      </blockquote>
+    </div>
+  </aside>
+
+  <div class="shell">
+    <div class="rule" aria-hidden="true"></div>
+    <p class="muted small text-center" style="margin-bottom: 32px;">
+      Read the full <a href="permanence.html">defense-in-depth doctrine →</a> · Run the <a href="tests.html">live test suite →</a>
+    </p>
+  </div>
 
   <footer class="site-footer">
-    <p>
-      Tessera — open source · <a href="https://github.com/MaximilianWik/Tessera" rel="noopener">code on GitHub</a> ·
-      <a href="docs/PERMANENCE.md">defense-in-depth write-up</a> ·
-      <a href="tests.html">live test suite</a>
-    </p>
+    <div class="site-footer__inner">
+      <div>
+        <pre class="ascii" aria-hidden="true">▓░▒░▓░▒░▓░▒░▓░▒░▓░▒░▓░▒░▓░▒░▓░▒░▓░▒░▓░▒░▓░▒</pre>
+        <span>TESSERA · MIT · </span>
+        <a href="https://tessera-neon.vercel.app/">tessera-neon.vercel.app</a>
+      </div>
+      <div class="site-footer__links">
+        <a href="https://github.com/MaximilianWik/Tessera" rel="noopener">Source</a>
+        <a href="permanence.html">Permanence</a>
+        <a href="tests.html">Diagnostics</a>
+        <a href="https://github.com/MaximilianWik/Tessera/issues" rel="noopener">Issues</a>
+      </div>
+    </div>
   </footer>
 
   <!-- Vendored decoders -->
   <script src="vendor/jsqr.js"></script>
   <script src="vendor/zxing.js"></script>
 
-  <!-- Tessera modules — order matters: reed-solomon must load before qr.js -->
+  <!-- Tessera modules: order matters, reed-solomon must load before qr.js -->
   <script src="src/reed-solomon.js"></script>
   <script src="src/qr.js"></script>
   <script src="src/png.js"></script>
   <script src="src/svg.js"></script>
   <script src="src/verify.js"></script>
   <script src="src/damage.js"></script>
+  <script src="src/damage-preview.js"></script>
   <script src="src/spec-sheet.js"></script>
   <script src="src/app.js"></script>
 </body>
