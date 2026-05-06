@@ -14,7 +14,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/USER/tessera.git"
+    "url": "https://github.com/MaximilianWik/Tessera.git"
+  },
+  "homepage": "https://tessera-neon.vercel.app/",
+  "bugs": {
+    "url": "https://github.com/MaximilianWik/Tessera/issues"
   },
   "dependencies": {},
   "devDependencies": {}
