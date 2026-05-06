@@ -1069,3 +1069,96 @@ button.btn, .btn {
 .mt-6 { margin-top: 24px; }
 .mt-8 { margin-top: 32px; }
 .flow > * + * { margin-top: 12px; }
+
+/* -- HERO CREDIT (watermark) ---------------------------------------------- */
+
+.hero__credit {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 24px 0 0;
+  padding: 14px 18px 14px 20px;
+  border-left: 3px solid var(--blood-1);
+  background: linear-gradient(90deg, rgba(196, 30, 38, 0.10) 0%, transparent 100%);
+  max-width: 520px;
+  position: relative;
+}
+.hero__credit-tag {
+  font-size: 10px;
+  letter-spacing: 0.34em;
+  color: var(--bone-3);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.hero__credit-name {
+  font-size: clamp(16px, 2.3vw, 22px);
+  letter-spacing: 0.18em;
+  color: var(--bone-0);
+  font-weight: 800;
+  text-transform: uppercase;
+  text-shadow: 1px 0 0 var(--blood-3);
+  margin: 2px 0;
+  line-height: 1.05;
+}
+.hero__credit-meta {
+  font-size: 10px;
+  letter-spacing: 0.30em;
+  color: var(--bone-3);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* -- TOLERANCE LOG (inline within damage panel) --------------------------- */
+
+.tolerance-log .damage-table { margin-top: 8px; }
+.tolerance-log .damage-table tr.active td {
+  background: rgba(196, 30, 38, 0.14);
+  color: var(--bone-0);
+  font-weight: 700;
+}
+.tolerance-log .damage-table tr.active td:first-child::before {
+  content: "▶ ";
+  color: var(--blood-1);
+  font-weight: 800;
+}
+
+/* -- TATTOO RECOMMENDATIONS TABLE ---------------------------------------- */
+
+.tattoo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+.tattoo-table th, .tattoo-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ink-4);
+  vertical-align: top;
+}
+.tattoo-table th {
+  color: var(--bone-3);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 700;
+  background: var(--ink-2);
+  border-bottom: 2px solid var(--ink-5);
+}
+.tattoo-table th:nth-child(2),
+.tattoo-table td:nth-child(2) { width: 68px; white-space: nowrap; }
+.tattoo-table th:last-child,
+.tattoo-table td:last-child   { width: 130px; white-space: nowrap; }
+.tattoo-table tr.rec {
+  background: linear-gradient(90deg, rgba(196,30,38,0.16), rgba(196,30,38,0.04) 60%, transparent);
+}
+.tattoo-table tr.rec td {
+  border-bottom-color: var(--blood-2);
+}
+.tattoo-table tr.rec td:first-child {
+  box-shadow: inset 3px 0 0 0 var(--blood-1);
+}
+.tattoo-table tr.rec strong {
+  color: var(--blood-0);
+  letter-spacing: 0.05em;
+}

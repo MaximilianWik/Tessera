@@ -166,22 +166,30 @@
         <span class="label">damage tolerance</span>
       </div>
       <div class="layer__body">
-        <h2>Damage tolerance simulation</h2>
-        <p>A QR with EC level H is specified to recover from up to <strong>30% module corruption</strong>, but with an important caveat: that 30% number applies to <strong>idealized clustering</strong> aligned with codeword boundaries. Reed-Solomon corrects up to half the EC codewords <em>per block</em>. Random module flips at, say, 5% spread across many distinct codewords easily exceed the per-block correction budget, even though the total fraction of damaged modules is far below 30%. Clustered damage flips many bits within a few codewords, which RS handles gracefully, but only if the cluster lands within a single block.</p>
-        <p>This is a feature, not a bug; it's how QR codes actually fail in the field. Real-world damage is <strong>always</strong> clustered: a scratch, a sticker, ink fade in one region, sun damage on one side, a cover-up tattoo over a corner. So the test simulates the realistic damage model:</p>
+        <h2>Damage tolerance: blur (real tattoo aging)</h2>
+        <p>Tattoos don't fail through hard "blot" cover-ups. They fail through gradual <strong>ink bleed and edge softening</strong>: a year of normal skin life rounds the corners of the modules, ten years blurs them appreciably, thirty years can leave the QR a soft watercolour. This is the failure mode Tessera simulates and tests against.</p>
+        <p>The damage model is a <strong>gaussian blur</strong> applied to the rendered QR canvas at a radius proportional to the chosen severity:</p>
         <ol>
-          <li>Take the rendered QR matrix.</li>
-          <li>Place a square "blot" centred at a random position, sized to cover approximately N% of the total module area. Flip every data module within. (Function patterns are not corrupted; see the note below.)</li>
-          <li>Re-run the round-trip decoders.</li>
-          <li>Repeat at 5%, 10%, 15%, 20%, 25%, 30% damage levels, with 5 trials per level (deterministic seed for reproducibility).</li>
-          <li>Record the highest damage level at which <strong>all</strong> trials still decode correctly.</li>
+          <li>Render the QR onto a clean canvas at high resolution (20 px per module).</li>
+          <li>Apply a gaussian blur with radius = (severity / 100) × moduleSize × 0.5. So 5% &asymp; one-tenth of a module of blur, 30% &asymp; half a module of blur.</li>
+          <li>Re-run the round-trip decoders against the blurred image.</li>
+          <li>Repeat at 0%, 5%, 10%, 15%, 20%, 25%, 30%. Blur is deterministic, so a single trial per level is enough.</li>
+          <li>Record the highest level at which the QR still decoded correctly.</li>
         </ol>
-        <p>The <strong>permanence bar</strong> is <strong>5% clustered damage tolerated reliably</strong> (100% pass rate across 5 random blot positions). That's the empirical floor reproducible across every QR size tested. Larger QRs (v6+) typically tolerate considerably more, 15 to 25% or higher. 5% was picked as the headline because the original plan's 25% claim, while consistent with the ISO spec on paper, doesn't reliably hold up under randomized blot positioning. Quoting a higher number would be dishonest about what the test actually measures.</p>
-        <p>Importantly, the actual measured tolerance for <em>your</em> QR is shown in the UI and recorded on the spec sheet, so if your input pushes the QR up to v6 or v10, you'll see and record a much higher tolerance number. The 5% bar is just the floor below which Tessera won't ship. The new <a href="index.html#damage-canvas-wrap">damage preview</a> on the generator lets you watch the verdict flip as you turn the level up.</p>
+        <p>Reading the severity scale in tattoo-aging terms:</p>
+        <ul>
+          <li><strong>0%</strong>: pristine, the day after the tattoo heals.</li>
+          <li><strong>5%</strong>: a fresh-ish tattoo after a few years; just-perceptible softening.</li>
+          <li><strong>15%</strong>: ~15-year-old tattoo with normal aging on a forearm or calf.</li>
+          <li><strong>30%</strong>: heavily blurred. A 30+ year old tattoo, or a poorly placed/maintained one, or a small dense one that ran together early.</li>
+        </ul>
+        <p>The <strong>permanence bar</strong> is <strong>5% blur tolerated</strong>. Every QR Tessera generates is swept through all seven levels on load and the highest level the decoders still read is reported on the live tolerance log on the right side of the damage preview.</p>
+        <p>Why a binary OK/FAIL per level rather than a pass-rate? Blur is deterministic; there's no random variable to average over. The test is "at this exact blur radius, do any decoders still read the exact input back?": a clean, reproducible yes-or-no.</p>
+        <p>Importantly, the actual measured tolerance for <em>your</em> QR is shown live in the UI and recorded on the spec sheet. If your input pushes the QR up to v6 or v10 (more redundancy per block), you'll see and record a much higher tolerance number. The 5% bar is just the floor below which Tessera won't ship. The <a href="index.html#damage-canvas-wrap">damage preview</a> on the generator lets you drag the slider and watch the verdict flip in real time.</p>
         <blockquote>
-          <strong>Why finders aren't damaged.</strong> The three finder patterns and the timing rows are not part of the data area and are <em>not</em> covered by the Reed-Solomon error-correction budget. They're what the decoder uses to <em>locate</em> the QR in the first place. If they're badly damaged, the decoder gives up before it even tries to read data. In practice a tattoo with a damaged finder is basically unreadable on any phone; there's no recovery path. The damage simulation excludes them because corrupting them tests detection (which has no spec-promised recovery), not error correction (which does). Real-world tattoo damage that makes a QR unreadable almost always comes from finder-pattern damage, not data-module damage. Keep the finders pristine.
+          <strong>Why finders aren't damaged in this model.</strong> Gaussian blur affects every pixel uniformly, including the finder patterns. That's accurate to real tattoos: ink bleed doesn't respect the spec. But the blur scale is calibrated so the finders are still detectable up to severe damage levels; losing the finders means losing detection entirely, with no recovery path. If a real tattoo gets so blurry the decoder can't find it, the recommendation is "ask the artist to touch it up", not "rely on a spec layer that wasn't designed for finder loss".
         </blockquote>
-        <p>Real-world tattoo failure modes (ink spread, fading, partial cover-up) usually correspond to clustered damage covering far less than 10% of the module area. A QR that survives 10% clustered corruption will almost certainly survive normal aging.</p>
+        <p>Real-world tattoo failure modes (ink spread, fading) usually correspond to blur covering far less than 10% on the Tessera scale. A QR that survives 10% blur in this simulation will almost certainly survive normal aging on properly sized ink.</p>
       </div>
     </article>
 

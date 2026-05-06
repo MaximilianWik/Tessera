@@ -1,10 +1,15 @@
 /* Tessera: UI glue for the generator page.
  *
- * Wires the input field, live preview, verification readout, damage
- * tolerance preview (slider + level buttons + canvas), damage tolerance
- * stats, and download controls. Defensive: download buttons stay disabled
- * until verification succeeds. The user cannot accidentally download a
- * broken QR.
+ * Wires:
+ *   - Input field (URL/text + EC level)
+ *   - Live preview canvas with metadata
+ *   - Round-trip verification readout
+ *   - Damage preview with INLINE tolerance log (blur model)
+ *   - Tattoo recommendations panel
+ *   - Download controls (locked until verification passes)
+ *
+ * Defensive: download buttons stay disabled until verification succeeds.
+ * The user cannot accidentally download a broken QR.
  */
 (function () {
   'use strict';
@@ -22,14 +27,13 @@
   var $metaMask      = document.getElementById('meta-mask');
   var $metaEC        = document.getElementById('meta-ec');
   var $verifyList    = document.getElementById('verify-list');
-  var $damageOut     = document.getElementById('damage-out');
   var $statusBadge   = document.getElementById('status-badge');
   var $btnPng        = document.getElementById('btn-png');
   var $btnSvg        = document.getElementById('btn-svg');
   var $btnSheet      = document.getElementById('btn-sheet');
   var $error         = document.getElementById('error');
 
-  // Damage preview controls
+  // Damage preview controls + inline tolerance log
   var $damageWrap    = document.getElementById('damage-canvas-wrap');
   var $damageCanvas  = document.getElementById('damage-canvas');
   var $damageVerdict = document.getElementById('damage-verdict');
@@ -38,15 +42,20 @@
   var $damageDecoded = document.getElementById('damage-decoded');
   var $damageSlider  = document.getElementById('damage-slider');
   var $damageLevels  = document.getElementById('damage-levels');
+  var $toleranceLog  = document.getElementById('tolerance-log');
+
+  // Tattoo recommendations
+  var $tattooStatus  = document.getElementById('tattoo-status');
+  var $tattooRecs    = document.getElementById('tattoo-recs');
 
   // -- State -------------------------------------------------------------------
 
   var currentQr      = null;
   var currentVerify  = null;
-  var currentDamage  = null;
-  var encodeSeq      = 0;          // monotonic; ignore late async results
-  var damageLevel    = 5;          // current preview level (%)
-  var damageSeq      = 0;          // monotonic for damage decode jobs
+  var currentTolerance = null;       // { levels, maxTolerated, passesPermanenceBar }
+  var encodeSeq      = 0;            // monotonic; ignore late async results
+  var damageLevel    = 5;            // current preview level (%)
+  var damageSeq      = 0;            // monotonic for damage decode jobs
 
   // -- Helpers -----------------------------------------------------------------
 
@@ -84,13 +93,15 @@
     setDownloadEnabled(false);
     currentQr = null;
     currentVerify = null;
-    currentDamage = null;
+    currentTolerance = null;
 
     if (!text) {
       setStatus('idle', 'Enter text');
       $previewWrap.hidden = true;
       $verifyList.innerHTML = '';
-      $damageOut.innerHTML = '';
+      $toleranceLog.innerHTML = '';
+      $tattooRecs.innerHTML = '';
+      $tattooStatus.textContent = 'awaiting input';
       $metaVersion.textContent = '·';
       $metaSize.textContent = '·';
       $metaMask.textContent = '·';
@@ -132,9 +143,12 @@
     $damageWrap.hidden = false;
     refreshDamagePreview();
 
+    // Render tattoo recommendations (synchronous, derived from qr only)
+    renderTattooRecs(qr, ecLevel);
+
     // Show "verifying" placeholder while async work runs
     $verifyList.innerHTML = '<li class="muted">Decoding with each available decoder…</li>';
-    $damageOut.innerHTML = '<p class="muted small">Running damage tolerance trials…</p>';
+    $toleranceLog.innerHTML = '<p class="muted small">Sweeping blur tolerance at all levels…</p>';
     setStatus('verifying', 'Verifying…');
 
     Tessera.Verify.verify(qr, text).then(function (vr) {
@@ -143,19 +157,19 @@
       renderVerify(vr);
       var anyAvailable = vr.decoders.some(function (d) { return d.available; });
       if (!anyAvailable) {
-        $damageOut.innerHTML = '<p class="bad small">No decoders available in this browser. Damage test skipped.</p>';
+        $toleranceLog.innerHTML = '<p class="bad small">No decoders available in this browser. Tolerance sweep skipped.</p>';
         setStatus('fail', 'No decoders');
         return;
       }
-      return Tessera.Damage.test(qr, text, { trialsPer: 5 }).then(function (dr) {
+      return Tessera.DamagePreview.sweepTolerance(qr, text).then(function (sweep) {
         if (seq !== encodeSeq) return;
-        currentDamage = dr;
-        renderDamage(dr);
+        currentTolerance = sweep;
+        renderToleranceLog(sweep);
         if (vr.ok) {
           var redundancy = vr.redundancy >= 3 ? '3 decoders'
                          : vr.redundancy === 2 ? '2 decoders' : '1 decoder';
-          var label = dr.passesPermanenceBar
-            ? 'Verified · ' + redundancy + ' · ' + dr.maxTolerated + '%'
+          var label = sweep.passesPermanenceBar
+            ? 'Verified · ' + redundancy + ' · blur ≤' + sweep.maxTolerated + '%'
             : 'Verified · ' + redundancy;
           setStatus('ok', label);
           setDownloadEnabled(true);
@@ -187,32 +201,77 @@
     $verifyList.innerHTML = html;
   }
 
-  function renderDamage(dr) {
+  function renderToleranceLog(sweep) {
     var bar;
-    if (dr.passesPermanenceBar) {
-      bar = '<p class="good small"><strong>PASS.</strong> Tolerates at least 5% clustered damage. Max fully tolerated: <strong>' + dr.maxTolerated + '%</strong>.</p>';
+    if (sweep.passesPermanenceBar) {
+      bar = '<p class="good small mt-0"><strong>PASS.</strong> Tolerates blur up to <strong>' + sweep.maxTolerated + '%</strong>.</p>';
     } else {
-      bar = '<p class="warn small"><strong>BELOW BAR.</strong> Highest fully-tolerated damage: ' + dr.maxTolerated + '%. (Bar is 5%.)</p>';
+      bar = '<p class="warn small mt-0"><strong>BELOW BAR.</strong> Highest blur tolerated: <strong>' + sweep.maxTolerated + '%</strong>.</p>';
     }
-    var rows = dr.levels.map(function (lv) {
-      var pct = (lv.passRate * 100).toFixed(0) + '%';
-      var cls = lv.passRate === 1 ? 'good' : (lv.passRate >= 0.5 ? 'warn' : 'bad');
-      return '<tr><td>' + lv.percent + '%</td><td class="' + cls + '">' + pct + '</td></tr>';
+    var rows = sweep.levels.map(function (lv) {
+      var cls = lv.percent === damageLevel ? 'active' : '';
+      var verdict = lv.ok
+        ? '<span class="good">OK</span>'
+        : '<span class="bad">FAIL</span>';
+      return '<tr class="' + cls + '"><td>' + lv.percent + '%</td><td>' + verdict + '</td></tr>';
     }).join('');
-    $damageOut.innerHTML = bar
-      + '<table class="damage-table"><thead><tr><th>damage</th><th>pass rate</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    $toleranceLog.innerHTML = bar
+      + '<table class="damage-table"><thead><tr><th>blur</th><th>scan</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+  // -- Tattoo recommendations -------------------------------------------------
+
+  // Module size guidance, in millimetres per module.
+  //   Min:    smallest size still reliably scannable on a phone (~0.7 mm)
+  //   Rec:    Tessera's recommended size — robust to a decade of normal blur
+  //   Cons:   conservative, ages best, much more forgiving of misink
+  var GRADES = [
+    { id: 'min',  label: 'Minimum (still scans)',           mm: 0.7, hint: 'Smallest size that still reliably scans on a phone today. Ages worst.' },
+    { id: 'rec',  label: 'Recommended (ASK FOR THIS)',      mm: 1.2, hint: 'Tessera\'s recommended size. Comfortable to scan, ages well, fits most placements.' },
+    { id: 'cons', label: 'Conservative (large, durable)',   mm: 1.8, hint: 'Most forgiving to ink bleed and skin stretch. Best choice for forearm, calf, back.' },
+  ];
+
+  function fmtCm(mm)  { return (mm / 10).toFixed(1) + ' cm'; }
+  function fmtMm(mm)  { return mm.toFixed(0) + ' mm'; }
+  function fmtIn(mm)  { return (mm / 25.4).toFixed(2) + ' in'; }
+
+  function renderTattooRecs(qr, ecLevel) {
+    var modulesPerSide = qr.size + 8; // including 4-module quiet zone each side
+    var ecOk = (ecLevel === 'H');
+
+    var rows = GRADES.map(function (g) {
+      var sideMm = modulesPerSide * g.mm;
+      var cls = (g.id === 'rec') ? ' class="rec"' : '';
+      return '<tr' + cls + '>'
+        + '<td><strong>' + g.label + '</strong><br><span class="muted small">' + g.hint + '</span></td>'
+        + '<td>' + fmtMm(g.mm) + '</td>'
+        + '<td><strong>' + fmtCm(sideMm) + '</strong> <span class="muted small">(' + fmtIn(sideMm) + ')</span></td>'
+        + '</tr>';
+    }).join('');
+
+    var optimization = ecOk
+      ? '<span class="good small">✓ tattoo-optimized</span>'
+      : '<span class="warn small">⚠ switch to level H for tattoo durability</span>';
+
+    $tattooStatus.innerHTML = optimization;
+
+    $tattooRecs.innerHTML =
+      '<dl class="meta-grid">' +
+      '  <dt>Version</dt><dd>v' + qr.version + ' · ' + qr.size + '×' + qr.size + ' modules</dd>' +
+      '  <dt>With quiet zone</dt><dd>' + modulesPerSide + '×' + modulesPerSide + ' modules wide</dd>' +
+      '  <dt>EC level</dt><dd>' + ecLevel + (ecOk ? ' (best)' : ' — H is better') + '</dd>' +
+      '</dl>' +
+      '<table class="tattoo-table mt-4"><thead><tr><th>Quality</th><th>Module</th><th>Tattoo size</th></tr></thead><tbody>'
+      + rows
+      + '</tbody></table>'
+      + '<p class="muted small mt-2">Show the artist the recommended <strong>' + fmtCm(modulesPerSide * 1.2) + '</strong> size. Smaller is harder to scan and ages worse. Bigger is fine. The quiet zone (white margin) is part of the spec; the artist must not crop it out.</p>';
   }
 
   // -- Damage preview wiring --------------------------------------------------
 
   function setDamageLevel(percent, source) {
     damageLevel = Math.max(0, Math.min(30, percent | 0));
-
-    // Sync slider
-    if (source !== 'slider') {
-      $damageSlider.value = damageLevel;
-    }
-    // Sync level buttons (snap to nearest preset for the active style only)
+    if (source !== 'slider') $damageSlider.value = damageLevel;
     var presets = Tessera.DamagePreview.LEVELS;
     var nearest = presets.reduce(function (a, b) {
       return Math.abs(b - damageLevel) < Math.abs(a - damageLevel) ? b : a;
@@ -220,7 +279,8 @@
     $damageLevels.querySelectorAll('button').forEach(function (b) {
       b.classList.toggle('active', parseInt(b.dataset.level, 10) === nearest && damageLevel === nearest);
     });
-
+    // Re-render tolerance log so the "active" row marker follows the level
+    if (currentTolerance) renderToleranceLog(currentTolerance);
     refreshDamagePreview();
   }
 
@@ -234,9 +294,8 @@
       $damageVerdict.textContent = '·';
       return;
     }
-    // Sync canvas size to fit the current QR
-    var moduleSize = Math.max(4, Math.floor(320 / (currentQr.size + 8)));
-    Tessera.DamagePreview.renderDamaged($damageCanvas, currentQr, damageLevel, { moduleSize: moduleSize });
+    var moduleSize = Math.max(8, Math.floor(360 / (currentQr.size + 8)));
+    Tessera.DamagePreview.renderBlurred($damageCanvas, currentQr, damageLevel, { moduleSize: moduleSize });
     $damagePct.textContent = damageLevel + '%';
     $damageStatus.textContent = 'decoding…';
     $damageVerdict.dataset.state = 'verifying';
@@ -246,7 +305,7 @@
 
     var seq = ++damageSeq;
     var expected = currentQr.text;
-    Tessera.DamagePreview.decodeDamaged(currentQr, damageLevel, expected).then(function (res) {
+    Tessera.DamagePreview.decodeBlurred(currentQr, damageLevel, expected, { moduleSize: moduleSize }).then(function (res) {
       if (seq !== damageSeq) return;
       if (res.ok) {
         $damageStatus.innerHTML = '<span class="good">decoded · matches input</span>';
@@ -310,7 +369,7 @@
     if (!currentQr) return;
     Tessera.SpecSheet.openInTab(currentQr, {
       verifyResult: currentVerify,
-      damageResult: currentDamage,
+      damageResult: currentTolerance,
     });
   });
 

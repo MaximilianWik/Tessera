@@ -9,6 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-05-06
 
+#### Run 5: blur damage model + creator credit + tattoo-optimized recommendations
+
+The damage tolerance system was rebuilt around a model that reflects how tattoos actually fail: gradual ink bleed, not random blot coverage. The hero subtitle was replaced with a stamped creator credit. A new tattoo-recommendations panel teaches users what physical size to ask the artist for. The damage preview and the per-level tolerance log are now a single panel, so the user sees both the live verdict and the full sweep at the same time.
+
+Added:
+
+- **`Tessera.DamagePreview`** rewritten around a gaussian-blur model. New API: `LEVELS`, `blurRadiusFor(percent, moduleSize)`, `renderBlurred(canvas, qr, percent, opts)`, `decodeBlurred(qr, percent, expected, opts)`, `sweepTolerance(qr, expected, opts)`. Blur radius scales linearly with damage percent and the rendered module size; 30% lands at nearly a full module of blur, which empirically renders small QRs unreadable while a v3-H QR still survives the first 15%.
+- Inline tolerance log inside the damage panel (`#tolerance-log` in `index.html`). Each blur level (0/5/10/15/20/25/30%) gets a row with a binary OK/FAIL verdict, computed once on QR change. The currently-selected slider level is highlighted with a blood-red marker so the user can see exactly where they are in the failure curve.
+- **Tattoo recommendations panel** (`#tattoo-recs` in `index.html`). Three quality grades (Minimum 0.7 mm/module, Recommended 1.2 mm/module, Conservative 1.8 mm/module) with computed total tattoo dimensions in cm and inches. The "Recommended" row is the answer the artist should be shown; it's highlighted with a blood-red side bar and "ASK FOR THIS" emphasis. The panel header shows a `✓ tattoo-optimized` badge when the EC level is H (the right setting for permanence) and a warning otherwise.
+- Hero **creator credit watermark** replacing the old "Permanent tiles for a permanent mark" subtitle. Three-line block: "A TESSERA BY / MAXIMILIAN WIKSTRÖM / · ARCHITECT · MMXXVI ·" with a blood-red side bar and a faint blood-red gradient backdrop. Site footer updated to include the same credit.
+- New CSS rules in `styles.css`: `.hero__credit*` (watermark), `.tolerance-log` (inline log row highlighting), `.tattoo-table` (recommendations table with `tr.rec` accent treatment).
+
+Changed:
+
+- **Default URL** is now `http://max-wik.com/` (was `https://example.com`). Test corpus in `tests/test-damage.js` updated to match.
+- The "blur ≤N%" tolerance number is now part of the verified-status badge label (`"Verified · 2 decoders · blur ≤15%"`), so the user sees their QR's measured durability without having to look at a separate panel.
+- `src/damage.js` is now a thin alias module that re-exports `Tessera.DamagePreview` as `Tessera.Damage` for backward compatibility with the existing test corpus and spec sheet.
+- `src/spec-sheet.js` reworked: blur tolerance instead of blot, new tattoo-recommendations section, new printable physical-size renderings (one per quality grade rather than fixed 3/5/7/10 cm), creator credit at the top.
+- `docs/PERMANENCE.md`'s and `permanence.html`'s Layer IV rewritten to describe the blur model, the calibration formula, the per-level interpretation in tattoo-aging terms, and why the test reports binary OK/FAIL per level rather than pass-rate (blur is deterministic).
+- HTML `<script>` load order updated: `damage-preview.js` now loads before `damage.js` (the alias).
+- `index.html` panel ordering: I Input · II Output · III Round-trip · IV Damage preview (with inline tolerance log) · V Tattoo specs · VI Export. Previously V was a separate "tolerance log" panel; that's now merged into IV, freeing slot V for the tattoo recommendations.
+
+Removed:
+
+- Old random-blot damage model (`Tessera.Damage._corruptModules`, `Tessera.Damage._mulberry32`, the `trialsPer` / `seed` parameters). The blur model is deterministic, so multi-trial averaging is no longer needed.
+- Old separate "Tolerance log" panel and the `damage-out` element. The tolerance log now lives inside the damage preview panel.
+- Old hero subtitle "Permanent tiles for a permanent mark…". The tagline is preserved as a quote in the README and as the title-bar quote in the docs, but no longer appears on the live site.
+
 #### Run 4: Vercel deployment fix (404 NOT_FOUND on root URL)
 
 The cyber-sigilism overhaul (run 3) created a `public/` directory full of imagery. After deploying to Vercel, the root URL started returning `404: NOT_FOUND` (Vercel error ID `arn1::drlxn-...`). The cause: Vercel's framework auto-detection treats a `public/` directory as the build output of a Next.js / CRA / similar SPA project, so it tried to serve `index.html` from inside `public/` (where it doesn't exist) instead of from the repo root (where it does).

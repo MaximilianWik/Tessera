@@ -31,7 +31,11 @@
     <div class="shell hero__inner">
       <div>
         <h1 class="hero__title">TESS<span class="accent">/</span>ERA</h1>
-        <p class="hero__sub">Permanent tiles for a permanent mark. A QR generator for codes that must work for life. Verified, decoded, stress-tested before you can download.</p>
+        <p class="hero__credit">
+          <span class="hero__credit-tag">A TESSERA BY</span>
+          <span class="hero__credit-name">MAXIMILIAN WIKSTRÖM</span>
+          <span class="hero__credit-meta">· ARCHITECT · MMXXVI ·</span>
+        </p>
       </div>
       <pre class="hero__sigil" aria-hidden="true">
        ▓▓▓▓▓▓▓▓▓
@@ -62,7 +66,7 @@
 
     <main class="app-grid">
 
-      <!-- INPUT --------------------------------------------------------- -->
+      <!-- I. INPUT ------------------------------------------------------ -->
       <section class="panel span-2">
         <div class="panel__hd">
           <h3><span class="num">I.</span> &nbsp; Input</h3>
@@ -70,7 +74,7 @@
         </div>
         <div class="field">
           <label class="field-label" for="input-text">Text or URL</label>
-          <textarea id="input-text" rows="2" autofocus spellcheck="false" autocorrect="off" autocapitalize="off">https://example.com</textarea>
+          <textarea id="input-text" rows="2" autofocus spellcheck="false" autocorrect="off" autocapitalize="off">http://max-wik.com/</textarea>
           <span class="field-hint"><span id="char-count">0</span> chars · <span id="byte-count">0</span> UTF-8 bytes</span>
         </div>
         <div class="field" style="max-width: 380px;">
@@ -79,14 +83,14 @@
             <option value="L">L · recovers ~7%</option>
             <option value="M">M · recovers ~15%</option>
             <option value="Q">Q · recovers ~25%</option>
-            <option value="H" selected>H · recovers ~30% (recommended)</option>
+            <option value="H" selected>H · recovers ~30% (recommended for tattoo)</option>
           </select>
           <span class="field-hint">H is the most damage-resistant. Use it for permanent ink.</span>
         </div>
         <p id="error" class="error" hidden></p>
       </section>
 
-      <!-- PREVIEW + METADATA ------------------------------------------- -->
+      <!-- II. PREVIEW + METADATA --------------------------------------- -->
       <section class="panel">
         <div class="panel__hd">
           <h3><span class="num">II.</span> &nbsp; Output</h3>
@@ -106,7 +110,7 @@
         </dl>
       </section>
 
-      <!-- ROUND-TRIP VERIFICATION -------------------------------------- -->
+      <!-- III. ROUND-TRIP VERIFICATION --------------------------------- -->
       <section class="panel">
         <div class="panel__hd">
           <h3><span class="num">III.</span> &nbsp; Round-trip</h3>
@@ -116,13 +120,13 @@
         <ul id="verify-list" class="check-list"></ul>
       </section>
 
-      <!-- DAMAGE PREVIEW (NEW, FEATURED) ------------------------------- -->
+      <!-- IV. DAMAGE PREVIEW + INLINE TOLERANCE LOG -------------------- -->
       <section class="panel panel--blood span-2">
         <div class="panel__hd">
-          <h3><span class="num">IV.</span> &nbsp; Damage preview</h3>
+          <h3><span class="num">IV.</span> &nbsp; Damage preview · blur (tattoo aging)</h3>
           <span id="damage-verdict" class="damage__verdict" data-state="idle">·</span>
         </div>
-        <p class="panel__hint">A square blot is dropped on the QR at the chosen size. Watch how much it can lose and still scan. Larger QRs survive more.</p>
+        <p class="panel__hint">Real tattoos fail through gradual ink bleed. This applies a gaussian blur to the QR at the chosen severity and re-decodes. The tolerance log on the right runs every level on load and tells you the highest blur the QR survives unaided.</p>
         <div class="damage">
           <div class="damage__stage">
             <div id="damage-canvas-wrap" class="damage__canvas-wrap" hidden>
@@ -134,7 +138,7 @@
             </div>
           </div>
           <div class="damage__controls">
-            <label class="field-label" for="damage-slider">Damage level</label>
+            <label class="field-label" for="damage-slider">Blur level</label>
             <div class="damage__levels" id="damage-levels">
               <button type="button" data-level="0">0%</button>
               <button type="button" data-level="5" class="active">5%</button>
@@ -145,27 +149,29 @@
               <button type="button" data-level="30">30%</button>
             </div>
             <input id="damage-slider" class="damage__slider" type="range" min="0" max="30" step="1" value="5">
-            <p class="muted small mt-2">5% is the universal floor across QR sizes. Real-world tattoo damage (fade, cover-up, scratch) is rarely more than 10 to 15% of a properly sized code. Drag slowly to watch the verdict flip.</p>
+            <p class="muted small mt-2">5% &asymp; a fresh tattoo after a few years. 15% &asymp; a 15-year-old tattoo with normal aging. 30% is heavily blurred.</p>
+            <div id="tolerance-log" class="tolerance-log mt-4"></div>
           </div>
         </div>
       </section>
 
-      <!-- DAMAGE STATS + EXPORT --------------------------------------- -->
+      <!-- V. TATTOO RECOMMENDATIONS ----------------------------------- -->
       <section class="panel">
         <div class="panel__hd">
-          <h3><span class="num">V.</span> &nbsp; Tolerance log</h3>
-          <span class="muted small">pass-rate per level</span>
+          <h3><span class="num">V.</span> &nbsp; Tattoo specs</h3>
+          <span id="tattoo-status" class="muted small">awaiting input</span>
         </div>
-        <p class="panel__hint">Five trials per level, each at a fresh random blot position. Reported, not gated.</p>
-        <div id="damage-out"></div>
+        <p class="panel__hint">Module size determines whether your phone can read the tattoo, and how durable it is to skin stretch and ink bleed. Show the artist the exact size you want.</p>
+        <div id="tattoo-recs"></div>
       </section>
 
+      <!-- VI. EXPORT --------------------------------------------------- -->
       <section class="panel">
         <div class="panel__hd">
           <h3><span class="num">VI.</span> &nbsp; Export</h3>
           <span class="muted small">locks until verified</span>
         </div>
-        <p class="panel__hint">PNG for the artist's screen. SVG for any size. Spec sheet for the archive (print and file with important documents).</p>
+        <p class="panel__hint">PNG for the artist's screen. SVG for any size (recommended for tattoo). Spec sheet for the archive (print and file with important documents).</p>
         <div class="button-row">
           <button id="btn-png" type="button" class="btn">PNG</button>
           <button id="btn-svg" type="button" class="btn">SVG</button>
@@ -202,6 +208,7 @@
         <pre class="ascii" aria-hidden="true">▓░▒░▓░▒░▓░▒░▓░▒░▓░▒░▓░▒░▓░▒░▓░▒░▓░▒░▓░▒░▓░▒</pre>
         <span>TESSERA · MIT · </span>
         <a href="https://tessera-neon.vercel.app/">tessera-neon.vercel.app</a>
+        <span> · A TESSERA BY MAXIMILIAN WIKSTRÖM · MMXXVI</span>
       </div>
       <div class="site-footer__links">
         <a href="https://github.com/MaximilianWik/Tessera" rel="noopener">Source</a>
@@ -222,8 +229,8 @@
   <script src="src/png.js"></script>
   <script src="src/svg.js"></script>
   <script src="src/verify.js"></script>
-  <script src="src/damage.js"></script>
   <script src="src/damage-preview.js"></script>
+  <script src="src/damage.js"></script>
   <script src="src/spec-sheet.js"></script>
   <script src="src/app.js"></script>
 </body>
