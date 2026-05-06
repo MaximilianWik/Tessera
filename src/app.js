@@ -232,12 +232,13 @@
   ];
 
   function fmtCm(mm)  { return (mm / 10).toFixed(1) + ' cm'; }
-  function fmtMm(mm)  { return mm.toFixed(0) + ' mm'; }
+  function fmtMm(mm)  { return mm.toFixed(1).replace(/\.0$/, '') + ' mm'; }
   function fmtIn(mm)  { return (mm / 25.4).toFixed(2) + ' in'; }
 
   function renderTattooRecs(qr, ecLevel) {
     var modulesPerSide = qr.size + 8; // including 4-module quiet zone each side
-    var ecOk = (ecLevel === 'H');
+    var optimal = Tessera.QR.findTattooOptimal(qr.text);
+    var isOptimal = optimal && (qr.version === optimal.version) && (qr.ecLevel === optimal.ecLevel);
 
     var rows = GRADES.map(function (g) {
       var sideMm = modulesPerSide * g.mm;
@@ -249,22 +250,59 @@
         + '</tr>';
     }).join('');
 
-    var optimization = ecOk
-      ? '<span class="good small">✓ tattoo-optimized</span>'
-      : '<span class="warn small">⚠ switch to level H for tattoo durability</span>';
+    if (isOptimal) {
+      $tattooStatus.innerHTML = '<span class="good small">✓ tattoo-optimized</span>';
+    } else {
+      $tattooStatus.innerHTML = '<span class="warn small">smaller QR available</span>';
+    }
 
-    $tattooStatus.innerHTML = optimization;
+    var optimalCallout = '';
+    if (optimal && !isOptimal) {
+      // Compute module size delta at the recommended (1.2 mm) target.
+      var currentSideMm = modulesPerSide * 1.2;
+      var optimalModulesPerSide = optimal.version * 4 + 17 + 8; // size = 4V+17, plus quiet zone
+      var optimalSideMm = optimalModulesPerSide * 1.2;
+      var moduleSizePctBigger = ((modulesPerSide / optimalModulesPerSide) - 1) * 100;
+      optimalCallout =
+        '<div class="optimal-callout">' +
+        '  <div class="optimal-callout__head">' +
+        '    <strong>Smaller QR available · v' + optimal.version + ' / level ' + optimal.ecLevel + '</strong>' +
+        '    <button id="btn-apply-optimal" type="button" class="btn btn--primary btn--small">Apply</button>' +
+        '  </div>' +
+        '  <p class="muted small">Your current settings encode this URL as <strong>v' + qr.version + ' / level ' + qr.ecLevel + '</strong> (' + qr.size + '×' + qr.size + ' modules). Switching to <strong>v' + optimal.version + ' / level ' + optimal.ecLevel + '</strong> (' + (optimalModulesPerSide - 8) + '×' + (optimalModulesPerSide - 8) + ' modules) gives <strong>' + moduleSizePctBigger.toFixed(0) + '% bigger modules</strong> at the same physical tattoo size, in exchange for <strong>' + recoveryDelta(qr.ecLevel, optimal.ecLevel) + '</strong> error correction.</p>' +
+        '  <p class="muted small">For tattoos this is usually the right trade: the dominant failure mode is blur, not localized damage, and bigger modules survive blur far better than higher EC at smaller modules.</p>' +
+        '</div>';
+    }
 
     $tattooRecs.innerHTML =
+      optimalCallout +
       '<dl class="meta-grid">' +
       '  <dt>Version</dt><dd>v' + qr.version + ' · ' + qr.size + '×' + qr.size + ' modules</dd>' +
       '  <dt>With quiet zone</dt><dd>' + modulesPerSide + '×' + modulesPerSide + ' modules wide</dd>' +
-      '  <dt>EC level</dt><dd>' + ecLevel + (ecOk ? ' (best)' : ' — H is better') + '</dd>' +
+      '  <dt>EC level</dt><dd>' + ecLevel + ' · recovers ~' + ECPCT[ecLevel] + '% of corrupted modules</dd>' +
       '</dl>' +
       '<table class="tattoo-table mt-4"><thead><tr><th>Quality</th><th>Module</th><th>Tattoo size</th></tr></thead><tbody>'
       + rows
       + '</tbody></table>'
       + '<p class="muted small mt-2">Show the artist the recommended <strong>' + fmtCm(modulesPerSide * 1.2) + '</strong> size. Smaller is harder to scan and ages worse. Bigger is fine. The quiet zone (white margin) is part of the spec; the artist must not crop it out.</p>';
+
+    // Wire apply button if shown
+    var $apply = document.getElementById('btn-apply-optimal');
+    if ($apply) {
+      $apply.addEventListener('click', function () {
+        $ecLevel.value = optimal.ecLevel;
+        scheduleRun();
+      });
+    }
+  }
+
+  var ECPCT = { L: 7, M: 15, Q: 25, H: 30 };
+
+  function recoveryDelta(fromLevel, toLevel) {
+    var diff = ECPCT[fromLevel] - ECPCT[toLevel];
+    if (diff > 0) return diff + '% less';
+    if (diff < 0) return (-diff) + '% more';
+    return 'the same';
   }
 
   // -- Damage preview wiring --------------------------------------------------
