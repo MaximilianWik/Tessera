@@ -6,10 +6,10 @@ This is a quick-reference summary of the QR encoding pipeline, oriented around h
 
 A QR code is a square grid of black and white *modules*. The grid encodes:
 
-- **Format info** — what error-correction level was used, which mask is applied (small region, near corners).
-- **Version info** — the size of the QR (only present for versions 7+).
-- **Function patterns** — the three big square "finder" patterns in the corners, the timing patterns, and small alignment patterns. These help scanners locate and orient the code.
-- **Data + ECC** — everything else. This is the bulk of the matrix.
+- **Format info**: what error-correction level was used, which mask is applied (small region, near corners).
+- **Version info**: the size of the QR (only present for versions 7+).
+- **Function patterns**: the three big square "finder" patterns in the corners, the timing patterns, and small alignment patterns. These help scanners locate and orient the code.
+- **Data + ECC**: everything else. This is the bulk of the matrix.
 
 The encoder's job is to turn input text into the data+ECC stream and place it correctly into the matrix, then apply the best-of-eight masking pattern, then write the format and version info on top.
 
@@ -22,7 +22,7 @@ QR has four built-in modes, each with different efficiency:
 | Mode | Best for | Bits per char (roughly) |
 |---|---|---|
 | Numeric | digits only | 3.33 |
-| Alphanumeric | uppercase A–Z, digits, `$%*+-./:` and space | 5.5 |
+| Alphanumeric | uppercase A to Z, digits, `$%*+-./:` and space | 5.5 |
 | Byte | anything (UTF-8 in practice) | 8 |
 | Kanji | Shift-JIS double-byte | 13 per 2 chars |
 
@@ -45,7 +45,7 @@ Four levels, defined by how much of the matrix is redundant ECC:
 | Q | ~25% |
 | **H** | **~30%** |
 
-**Tessera defaults to H** — the most redundant — because permanence is the whole point.
+**Tessera defaults to H**, the most redundant, because permanence is the whole point.
 
 ### 4. Build the bit stream
 
@@ -58,11 +58,11 @@ Four levels, defined by how much of the matrix is redundant ECC:
 [pad bytes 0xEC, 0x11 alternating until capacity]
 ```
 
-### 5. Reed–Solomon error correction
+### 5. Reed-Solomon error correction
 
 The data is split into one or more *blocks* (table in the spec). Each block gets RS error-correction codewords appended. The number of EC codewords per block is fixed for each (version, level) combination.
 
-RS encoding is polynomial division over GF(256) — the finite field of 256 elements built using the QR-specific primitive polynomial `0x11D` (x⁸ + x⁴ + x³ + x² + 1). Tessera implements GF(256) from scratch (`src/reed-solomon.js`) — under 200 lines.
+RS encoding is polynomial division over GF(256), the finite field of 256 elements built using the QR-specific primitive polynomial `0x11D` (x⁸ + x⁴ + x³ + x² + 1). Tessera implements GF(256) from scratch (`src/reed-solomon.js`) in under 200 lines.
 
 ### 6. Interleave codewords
 
@@ -78,7 +78,7 @@ Working from the bottom-right, snake upward in 2-column zig-zags, skipping the t
 
 ### 8. Pick the best mask
 
-There are 8 standard mask patterns. Each mask XORs a regular geometric pattern with the data area only — function patterns are never masked.
+There are 8 standard mask patterns. Each mask XORs a regular geometric pattern with the data area only; function patterns are never masked.
 
 For each mask, the encoder computes a *penalty score* based on four heuristics (long runs of same-colour modules, 2×2 blocks of same colour, finder-pattern lookalikes, dark/light imbalance). The mask with the **lowest** penalty wins.
 
@@ -95,4 +95,4 @@ The matrix is ready to render.
 - All 40 versions and all 4 EC levels are implemented.
 - Byte mode is the default; numeric/alphanumeric/kanji are not auto-selected (Byte handles everything correctly, just less efficiently).
 - The mask scoring follows ISO/IEC 18004 §7.8.3 verbatim.
-- Reed–Solomon uses LUT-based GF(256) multiplication for speed and simplicity.
+- Reed-Solomon uses LUT-based GF(256) multiplication for speed and simplicity.

@@ -1,6 +1,6 @@
 # Vendored decoders
 
-This directory holds **committed copies** of the two third-party QR decoders Tessera uses for round-trip verification. The decoders are not loaded from a CDN at runtime — they're served from this repo as part of the static site. This means:
+This directory holds **committed copies** of the two third-party QR decoders Tessera uses for round-trip verification. The decoders are not loaded from a CDN at runtime; they're served from this repo as part of the static site. This means:
 
 1. **No supply-chain risk.** The exact decoder code is part of your Git history. If the upstream package were ever compromised, your existing builds are unaffected.
 2. **No external network calls.** The Tessera site has zero runtime dependencies on third-party services.
@@ -18,7 +18,7 @@ This directory holds **committed copies** of the two third-party QR decoders Tes
 - **Usage**: `jsQR(rgbaUint8ClampedArray, width, height) -> { data, ... } | null`
 
 ### `zxing.js`
-- **Project**: [zxing-js/library](https://github.com/zxing-js/library) — the JavaScript port of [Google ZXing](https://github.com/zxing/zxing), the canonical reference QR decoder used in Android ML Kit Vision.
+- **Project**: [zxing-js/library](https://github.com/zxing-js/library), the JavaScript port of [Google ZXing](https://github.com/zxing/zxing), the canonical reference QR decoder used in Android ML Kit Vision.
 - **Version**: 0.21.3
 - **Source**: `https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js`
 - **License**: Apache-2.0
@@ -26,7 +26,7 @@ This directory holds **committed copies** of the two third-party QR decoders Tes
 - **Usage**: `new ZXing.QRCodeReader().decode(new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(new ZXing.RGBLuminanceSource(...))))`
 
 ### Native `BarcodeDetector`
-A third decoder is used when available: the browser's built-in [`BarcodeDetector`](https://developer.mozilla.org/en-US/docs/Web/API/BarcodeDetector). On Chrome and Edge this calls the **OS-level decoder** — the same code iPhones and Androids use in the camera app. There's nothing to vendor here; the runtime feature-detects it.
+A third decoder is used when available: the browser's built-in [`BarcodeDetector`](https://developer.mozilla.org/en-US/docs/Web/API/BarcodeDetector). On Chrome and Edge this calls the **OS-level decoder**, the same code iPhones and Androids use in the camera app. There's nothing to vendor here; the runtime feature-detects it.
 
 ## Verifying authenticity
 
