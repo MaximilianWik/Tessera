@@ -40,6 +40,7 @@
   var $damagePct     = document.getElementById('damage-pct');
   var $damageStatus  = document.getElementById('damage-status');
   var $damageDecoded = document.getElementById('damage-decoded');
+  var $damageDecoders = document.getElementById('damage-decoders');
   var $damageSlider  = document.getElementById('damage-slider');
   var $damageLevels  = document.getElementById('damage-levels');
   var $toleranceLog  = document.getElementById('tolerance-log');
@@ -113,6 +114,7 @@
       $damageDecoded.classList.remove('ok', 'fail');
       $damageVerdict.dataset.state = 'idle';
       $damageVerdict.textContent = '·';
+      if ($damageDecoders) $damageDecoders.innerHTML = '';
       return;
     }
 
@@ -130,9 +132,12 @@
     if (seq !== encodeSeq) return;
 
     currentQr = qr;
-    Tessera.PNG.renderInto($previewCanvas, qr, {
-      moduleSize: Math.max(4, Math.floor(280 / (qr.size + 8))),
-    });
+    // Render preview + damage canvases at the SAME module size so they line
+    // up visually on desktop. The damage panel's internal grid puts its
+    // canvas at the same x-position as the output panel's canvas; matching
+    // sizes makes that alignment readable.
+    var canvasModuleSize = Math.max(6, Math.floor(280 / (qr.size + 8)));
+    Tessera.PNG.renderInto($previewCanvas, qr, { moduleSize: canvasModuleSize });
     $previewWrap.hidden = false;
     $metaVersion.textContent = qr.version;
     $metaSize.textContent = qr.size + ' × ' + qr.size + ' modules';
@@ -330,9 +335,12 @@
       $damageDecoded.classList.remove('ok', 'fail');
       $damageVerdict.dataset.state = 'idle';
       $damageVerdict.textContent = '·';
+      $damageDecoders.innerHTML = '';
       return;
     }
-    var moduleSize = Math.max(8, Math.floor(360 / (currentQr.size + 8)));
+    // Use the same module size as the output preview so the two canvases
+    // visually match. Both end up in the left column of a 2-col internal grid.
+    var moduleSize = Math.max(6, Math.floor(280 / (currentQr.size + 8)));
     Tessera.DamagePreview.renderBlurred($damageCanvas, currentQr, damageLevel, { moduleSize: moduleSize });
     $damagePct.textContent = damageLevel + '%';
     $damageStatus.textContent = 'decoding…';
@@ -340,11 +348,13 @@
     $damageVerdict.textContent = 'decoding…';
     $damageDecoded.classList.remove('ok', 'fail');
     $damageDecoded.textContent = '…';
+    if ($damageDecoders) $damageDecoders.innerHTML = '<li class="muted">checking decoders…</li>';
 
     var seq = ++damageSeq;
     var expected = currentQr.text;
     Tessera.DamagePreview.decodeBlurred(currentQr, damageLevel, expected, { moduleSize: moduleSize }).then(function (res) {
       if (seq !== damageSeq) return;
+      renderDamageDecoders(res.decoders, expected);
       if (res.ok) {
         $damageStatus.innerHTML = '<span class="good">decoded · matches input</span>';
         $damageVerdict.dataset.state = 'ok';
@@ -371,6 +381,23 @@
       $damageVerdict.textContent = 'ERROR';
       $damageStatus.textContent = String(err.message || err);
     });
+  }
+
+  function renderDamageDecoders(decoders, expectedText) {
+    if (!$damageDecoders) return;
+    var html = decoders.map(function (d) {
+      if (!d.available) {
+        return '<li class="muted"><strong>' + d.name + '</strong> not available</li>';
+      }
+      if (!d.success) {
+        return '<li class="bad"><strong>' + d.name + '</strong> can\'t read it</li>';
+      }
+      if (d.decoded !== expectedText) {
+        return '<li class="bad"><strong>' + d.name + '</strong> mismatch</li>';
+      }
+      return '<li class="good"><strong>' + d.name + '</strong> reads exact</li>';
+    }).join('');
+    $damageDecoders.innerHTML = html;
   }
 
   // -- Download handlers -------------------------------------------------------
