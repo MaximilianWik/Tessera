@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Run 13: background sigils removed entirely; full grammar/spelling sweep across site and docs
 
-The bg-sigils experiment (introduced and bumped through runs 10–12, briefly extended to a 7-slot continuous coverage pattern in the prior unsaved session) didn't land aesthetically. This run pulls them out completely and uses the moment to do a top-to-bottom prose pass across every user-facing page and the two `docs/` files, fixing both lint-grade nits and one substantive content drift: the README and `docs/PERMANENCE.md` were still describing the old square-blot damage model even though the actual code, the live preview, and `permanence.html` had all migrated to the Gaussian-blur model in run 6+.
+The bg-sigils experiment (introduced in run 10 and refined through runs 11–12) didn't land aesthetically. This run pulls them out completely and uses the moment to do a top-to-bottom prose pass across every user-facing page and the two `docs/` files, fixing both lint-grade nits and one substantive content drift: the README and `docs/PERMANENCE.md` were still describing the old square-blot damage model even though the actual code, the live preview, and `permanence.html` had all migrated to the Gaussian-blur model in run 6+.
 
 Removed:
 
@@ -50,7 +50,7 @@ Verified:
 Notes / context:
 
 - The bg-sigils were attempting to add atmospheric depth around the centred shell but ended up reading as visual noise that fought the panel content for attention rather than complementing it. The hero `<pre class="hero__sigil">` art per page already does the sigilism work; the page edges work better empty.
-- "Verify every post" caught a real bug in the doctrine page math (the 0.5 vs. 3 multiplier on the blur formula). The README and `docs/PERMANENCE.md` Layer-4 staleness was the bigger issue — those would have been actively misleading to anyone auditing the project off the GitHub README, and the "what the project doesn't claim" blockquote was contradicting itself between the run-6+ blur model and the run-pre-6 blot prose. All three locations of that blockquote now agree.
+- The doc sweep caught a real bug in the doctrine page math (the 0.5 vs. 3 multiplier on the blur formula). The README and `docs/PERMANENCE.md` Layer-4 staleness was the bigger issue — those would have been actively misleading to anyone auditing the project off the GitHub README, and the "what the project doesn't claim" blockquote was contradicting itself between the run-6+ blur model and the run-pre-6 blot prose. All three locations of that blockquote now agree.
 
 #### Run 12: "About the name" section ported into the permanence page (with the Hagia Sophia mosaic)
 
@@ -69,12 +69,12 @@ Verified:
 
 #### Run 11: cathedral/cross sigil swapped, tolerance log moved under the slider, bg sigil visibility fixed
 
-User feedback after run 10: the background sigils I added in runs 9 and 10 weren't actually visible (opacity 0.045 against a near-black background rendered them basically invisible), the damage preview's two columns made the QR codes look mismatched against the Output panel above, the user didn't like the cathedral/cross dot-art piece I'd been using, and the tolerance log belonged with the slider, not with the decoders.
+After run 10 four issues remained: the background sigils introduced in runs 9 and 10 weren't actually visible (opacity 0.045 against a near-black background rendered them basically invisible), the damage preview's two columns made the QR codes look mismatched against the Output panel above, the cathedral/cross dot-art piece read too religious for the rest of the sigilism aesthetic, and the tolerance log belonged with the slider, not with the decoders.
 
 Changed:
 
 - **Background sigil opacity** bumped from 0.045 to 0.22 (5x more visible). Added `mix-blend-mode: screen` for additive blending against the black ground, plus a stronger `text-shadow` glow. Pulled positions inward (e.g. `right: -120px` to `right: -40px`) so more of each sigil sits in the visible page margins around the centred shell rather than mostly clipped offscreen. The background pieces are now genuinely visible peeking from behind/around the panels.
-- **Damage preview restructured to 3 columns** (canvas | slider/buttons | decoder status), per the user's layout sketch. Column 1: QR canvas with a `Damage / N%` indicator beneath. Column 2: blur level label, 7 preset buttons, slider, hint text, **and the tolerance log** (PASS line + per-level OK/FAIL table). Column 3: status callout, per-decoder check-list, decoded URL. Below 1100 px the decoder column drops to a full-width row beneath the canvas + slider; below 720 px everything stacks single-column.
+- **Damage preview restructured to 3 columns** (canvas | slider/buttons | decoder status). Column 1: QR canvas with a `Damage / N%` indicator beneath. Column 2: blur level label, 7 preset buttons, slider, hint text, **and the tolerance log** (PASS line + per-level OK/FAIL table). Column 3: status callout, per-decoder check-list, decoded URL. Below 1100 px the decoder column drops to a full-width row beneath the canvas + slider; below 720 px everything stacks single-column.
 - **Cathedral/cross dot-art replaced with the angular flowing sigil** (sourced from emojicombos.com/sigil) wherever it appeared: index hero, index `bg-sigil--ml` (large), permanence `bg-sigil--mr` (large), tests `bg-sigil--tr` (large). The new piece is a two-segment flowing glyph connected by a horizontal joint, less religious-looking than a cross.
 - New CSS rules: `.damage__canvas-col`, `.damage__slider-col`, `.damage__decoder-col` (the 3-column flex children); `.damage__pct-line` + `.damage__pct-value` (the damage-percent indicator under the canvas); `.damage__status-line` (the callout box at the top of column 3). Old `.damage__stage`, `.damage__readout`, `.damage__controls` rules deleted; their replacements live in the new column classes.
 
@@ -87,7 +87,7 @@ Verified:
 
 #### Run 10: panel alignment, decoder check-list in damage preview, large background sigils
 
-Three things from the user's feedback. The two QR canvases on desktop were not aligned (Output canvas centered in its panel; Damage canvas was further right because its panel spans both columns). The damage preview only reported a single rolled-up verdict, but the round-trip panel had taught the user to expect a per-decoder breakdown. And the page wanted more atmospheric ASCII art beyond the hero sigils.
+Three issues to address. The two QR canvases on desktop were not aligned (Output canvas centered in its panel; Damage canvas was further right because its panel spans both columns). The damage preview only reported a single rolled-up verdict, while the round-trip panel had set the per-decoder-breakdown expectation. And the page wanted more atmospheric ASCII art beyond the hero sigils.
 
 Added:
 
@@ -129,7 +129,7 @@ Notes:
 
 #### Run 8: blur-detection bug fix (iOS Safari < 17 silently no-ops ctx.filter)
 
-Run 7's mobile fix added a JS box-blur fallback for browsers without canvas filter support, gated on a `HAS_CTX_FILTER` detection. The detection had a subtle bug: it set `ctx.filter = 'blur(2px)'` and then read it back, expecting browsers without filter support to either throw or return a different value. iOS Safari before v17 does neither; assigning to a non-existent property silently creates a regular JS property on the context object, so reading it back returns the value that was set, the equality test passes, Tessera concludes filter is supported, takes the native path, and the blur silently does nothing. The user's "still doesn't work on mobile" report.
+Run 7's mobile fix added a JS box-blur fallback for browsers without canvas filter support, gated on a `HAS_CTX_FILTER` detection. The detection had a subtle bug: it set `ctx.filter = 'blur(2px)'` and then read it back, expecting browsers without filter support to either throw or return a different value. iOS Safari before v17 does neither; assigning to a non-existent property silently creates a regular JS property on the context object, so reading it back returns the value that was set, the equality test passes, Tessera concludes filter is supported, takes the native path, and the blur silently does nothing. So run 7's mobile fix didn't actually fix iOS Safari < 17.
 
 Changed:
 
@@ -143,7 +143,7 @@ Verified:
 
 #### Run 7: mobile fix (blur preview broken on iOS Safari, layout overflow)
 
-The user flagged that the damage preview didn't work on mobile and the layout was broken. Two real bugs:
+The damage preview didn't work on mobile and the layout was broken. Two real bugs:
 
 1. The blur effect uses `ctx.filter = 'blur(Npx)'` on the canvas 2D context. iOS Safari before v17 (released September 2023) doesn't support that property; the assignment silently no-ops and the rendered QR stays pristine at every damage level. So the blur preview never appeared to do anything on a non-trivial fraction of iPhones, and decoders happily read the unblurred image at "30% damage" too.
 2. The damage canvas was rendered at a fixed pixel size (~333 px wide for a v3 QR) without `max-width: 100%` on the canvas element. On phones below ~360 px CSS width, that overflowed the panel and pushed the whole page sideways. A few other places (tattoo table fixed column widths, site-nav padding, hero credit max-width) also overflowed at narrow viewports.
@@ -176,7 +176,7 @@ Verified:
 
 #### Run 6: tattoo-optimal recommendation (fewer modules wins for blur)
 
-The user pointed out (correctly) that fewer modules is generally better for tattoos: physical module size dominates the blur failure mode, and a higher-EC choice that pushes the QR up a version actually makes each module smaller. The default of "always level H" was wrong for the tattoo use case. This run adds a tattoo-aware recommendation that picks the smallest version that fits the data at any EC level, paired with the highest EC at that version, and surfaces it in the tattoo specs panel as a one-click switch.
+Fewer modules is generally better for tattoos: physical module size dominates the blur failure mode, and a higher-EC choice that pushes the QR up a version actually makes each module smaller. The default of "always level H" was wrong for the tattoo use case. This run adds a tattoo-aware recommendation that picks the smallest version that fits the data at any EC level, paired with the highest EC at that version, and surfaces it in the tattoo specs panel as a one-click switch.
 
 Added:
 
