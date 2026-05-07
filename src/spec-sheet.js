@@ -31,9 +31,9 @@
   var T = global.Tessera = global.Tessera || {};
 
   var TATTOO_GRADES = [
-    { id: 'min',  label: 'Minimum (still scans)',           mm: 0.7 },
-    { id: 'rec',  label: 'Recommended',                     mm: 1.2 },
-    { id: 'cons', label: 'Conservative (large, durable)',   mm: 1.8 },
+    { id: 'min',  label: 'Minimum (today-scannable)',       mm: 1.0 },
+    { id: 'rec',  label: 'Recommended',                     mm: 1.7 },
+    { id: 'cons', label: 'Conservative (50+ year margin)',  mm: 2.2 },
   ];
 
   function escapeHtml(s) {
@@ -137,7 +137,7 @@
         + '</tr>';
     }).join('');
     return ''
-      + '<p>Show the artist <strong>the recommended size</strong>. The module size is what determines whether a phone can read the tattoo and how durable it is to skin stretch and ink bleed. Bigger modules age much better; smaller modules will scan today but may not in twenty years.</p>'
+      + '<p>Show the artist <strong>the recommended size</strong>. Module size determines whether a phone can read the tattoo and how well it withstands skin stretch and ink bleed over decades. Bigger modules age dramatically better; smaller modules will scan today but may not in twenty years. Practitioner consensus for tattoo QR codes is roughly 5 cm side length, which is what the recommended grade lands at for typical-URL payloads.</p>'
       + '<table>'
       + '<thead><tr><th>Quality</th><th>Module size</th><th>Tattoo size (incl. quiet zone)</th></tr></thead>'
       + '<tbody>' + rows + '</tbody>'
@@ -180,7 +180,7 @@
       ? '<p class="good">PASS. Survives gaussian blur up to <strong>' + damageResult.maxTolerated + '%</strong> on the Tessera scale (a single-trial decode at each level).</p>'
       : '<p class="bad">FAIL. Highest blur level still decoded: ' + damageResult.maxTolerated + '%.</p>';
     return bar
-      + '<p class="muted">Blur model: gaussian convolution with radius = (severity / 100) &times; module-pixel-size &times; 0.5. 5% &asymp; a few-year-old tattoo, 15% &asymp; ~15-year-old tattoo with normal aging, 30% &asymp; severe ink bleed. See the permanence doctrine on the live site for why blur is the right model for tattoo aging.</p>'
+      + '<p class="muted">Blur model: Gaussian convolution with radius = (severity / 100) &times; module-pixel-size &times; 3. 5% &asymp; a few-year-old tattoo, 15% &asymp; ~15-year-old tattoo with normal aging, 30% &asymp; severe ink bleed (nearly a full module of blur). See the permanence doctrine on the live site for why blur is the right model for tattoo aging.</p>'
       + '<table><thead><tr><th>Blur</th><th>Decoded</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>';
   }
 
@@ -253,7 +253,7 @@
         + renderTattooHtml(qr)
 
         + '<h2>Reference renderings (actual physical size)</h2>\n'
-        + '<p class="muted">Each is the same QR at a different module size. The recommended one (1.2 mm/module) is the right answer for most placements; pick a larger size for forearm/calf/back placements that you want to last decades.</p>\n'
+        + '<p class="muted">Each is the same QR at a different module size. The recommended one (1.7 mm/module, ~5 cm side) is the right answer for most placements; pick a larger size for forearm/calf/back placements that you want to last decades. Plan on a touch-up every 10-15 years to keep edges crisp.</p>\n'
         + renderQRSizesHtml(qr)
 
         + '<h2>Round-trip verification</h2>\n'
