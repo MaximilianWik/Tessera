@@ -163,7 +163,7 @@ strong, b { font-weight: 700; color: var(--bone-0); }
   overflow: hidden;
   user-select: none;
 }
-.rule::before { content: "▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░▓░"; }
+.rule::before { content: "𓌹 ⛓ ✶ ♱ ✶ ⛓ 𓆩 ⊹ ✦ ⊹ 𓆪 ⛓ ✶ ♱ ✶ ⛓ 𓌺 ⛓ ✶ ♱ ✶ ⛓ 𓆩 ⊹ ✦ ⊹ 𓆪 ⛓ ✶ ♱ ✶ ⛓ 𓌹"; }
 
 /* -- HEADER / NAV ----------------------------------------------------------- */
 
@@ -282,13 +282,18 @@ strong, b { font-weight: 700; color: var(--bone-0); }
 }
 .hero__sigil {
   font-family: var(--font-mono);
-  font-size: 10px;
-  line-height: 1.1;
+  font-size: 9px;
+  line-height: 1.0;
+  letter-spacing: 0;
   white-space: pre;
   color: var(--blood-1);
   text-shadow: 0 0 12px var(--blood-glow);
   user-select: none;
   opacity: 0.85;
+  /* Braille dot art has tall pieces — let them stay readable but cap height
+     on smaller heroes so they don't push the layout. */
+  max-height: 360px;
+  overflow: hidden;
 }
 @media (max-width: 720px) {
   .hero { padding: 56px 0 48px; }
