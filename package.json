@@ -20,6 +20,7 @@
   "bugs": {
     "url": "https://github.com/MaximilianWik/Tessera/issues"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
 }
