@@ -23,19 +23,19 @@ body { position: relative; }
   position: absolute;
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 26px;
+  font-size: 32px;
   line-height: 0.95;
   letter-spacing: 0;
   white-space: pre;
   color: var(--blood-1);
-  opacity: 0.22;
+  opacity: 0.55;
   user-select: none;
   font-weight: 400;
-  text-shadow: 0 0 24px var(--blood-glow), 0 0 8px var(--blood-glow);
+  text-shadow: 0 0 32px var(--blood-glow), 0 0 12px var(--blood-glow);
   mix-blend-mode: screen;
 }
-.bg-sigil--lg { font-size: 36px; opacity: 0.18; }
-.bg-sigil--xl { font-size: 48px; opacity: 0.14; }
+.bg-sigil--lg { font-size: 44px; opacity: 0.48; }
+.bg-sigil--xl { font-size: 56px; opacity: 0.40; }
 
 /* Position sigils so they peek out from the margins of the centred shell
    (max-width 1280 px, so ~80–160 px of empty page on each side at 1440+),
