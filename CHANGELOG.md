@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-05-07
 
+#### Run 10: panel alignment, decoder check-list in damage preview, large background sigils
+
+Three things from the user's feedback. The two QR canvases on desktop were not aligned (Output canvas centered in its panel; Damage canvas was further right because its panel spans both columns). The damage preview only reported a single rolled-up verdict, but the round-trip panel had taught the user to expect a per-decoder breakdown. And the page wanted more atmospheric ASCII art beyond the hero sigils.
+
+Added:
+
+- **Per-decoder check-list in the damage preview**, identical pattern to the round-trip panel. New `<ul id="damage-decoders" class="check-list">` inside the damage readout. Each decoder gets a row (good `jsQR reads exact`, bad `zxing-js mismatch`, bad `BarcodeDetector can't read it`, muted `not available`). Wired in `src/app.js` via a new `renderDamageDecoders(decoders, expectedText)` function called from the `decodeBlurred(...).then(...)` handler. Also clears to a `checking decoders…` placeholder while async decode is in flight, so the user sees something change immediately when dragging the slider.
+- **Large background sigils**: three to four pieces per page, position-absolute behind content, opacity around 0.04 with `text-shadow` glow, at font-sizes 24 to 40 px (on top of the existing 9 px hero sigils). Hidden on phones via the same `max-width: 720px` media query, since they don't read as atmosphere on small screens. New `.bg-sigils` container + `.bg-sigil` styles + position variants (`--tr` / `--ml` / `--mr` / `--bl`) + size variants (`--lg` / `--xl`) in `styles.css`.
+- New `.output-grid` layout class (auto + 1fr) that puts the Output panel's canvas on the left and the metadata grid on the right, mirroring the Damage panel's internal split. Collapses to single-column at `≤720 px`.
+
+Changed:
+
+- **Panel II Output canvas** now sits in the left column of an internal 2-col grid (canvas + metadata), at the same x-position as the Damage panel's canvas. Both QRs visually line up on desktop.
+- **Both canvases now render at the same module size**: `Math.max(6, Math.floor(280 / (qr.size + 8)))` instead of two different formulas. For the default v3-H QR that's 296 px square, identical between the two panels.
+- All three pages get a new `<div class="bg-sigils" aria-hidden="true">` block immediately inside `<body>`, containing the large ASCII pieces. Generator gets winged-head + cathedral-cross + drip-sigil. Permanence gets four pieces at varied rotations. Diagnostics gets two.
+- Body now has `position: relative` so the absolutely-positioned `.bg-sigils` container has a stacking context. Header / hero / shell / image-strip / footer / test-page all get `position: relative; z-index: 1` so they paint above the bg sigils.
+
+Verified:
+
+- 93/93 tests still green.
+- Damage decoders list confirmed in the rendered DOM: `jsQR reads exact zxing-js reads exact BarcodeDetector not available` (matches the round-trip panel for the same QR).
+- Output canvas + Damage canvas at the same x-coordinate on desktop screenshots at 1440 px wide.
+- Mobile screenshots at 375 px wide unchanged from the previous run: bg sigils correctly hidden, layout still stacks cleanly, no horizontal overflow.
+
 #### Run 9: authentic cyber-sigilism dot-art (replacing the placeholder block-character sigils)
 
 The hero ASCII art on all three pages was replaced with authentic Unicode-braille dot-art pieces sourced from emojicombos.com/cyber-sigilism. The previous block-character sigils (built from `▓▒░█` / `╔═╗║`) read as generic "ASCII art" rather than cyber-sigilism specifically; the braille-pattern art is the actual aesthetic the genre is built on. Three distinct pieces: a cathedral / cross-rising figure on the generator, a winged-head figure on the diagnostics page, and a large winged sigil with a long vertical drip on the permanence doctrine. Plus symbol-string accents (𓌹 𓆩 𓆪 𓌺 ⛓ ✶ ♱ ⊹ ✦) threaded through the meta-rails, footer ASCII rules, section dividers, and the hero credit watermark.

@@ -10,6 +10,60 @@
 </head>
 <body data-page="landing">
 
+  <!-- Background sigils: large, faded dot-art behind the content layer.
+       Hidden on mobile. Decorative only. -->
+  <div class="bg-sigils" aria-hidden="true">
+    <pre class="bg-sigil bg-sigil--tr bg-sigil--lg">
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡴⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣯⠀⢀⣠⡶⠛⠉⠙⠳⡄⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢺⣰⠟⠁⠀⠀⠀⠀⠀⠉⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡏⠀⠀⣠⠤⢤⡀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠆⠀⠸⠄⠀⠀⣿⡄⣀⡀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣳⠀⠀⠀⠀⢀⣾⣿⡇⢠⣿⠀⠀⠀
+⠀⠀⠀⣀⣠⣶⢴⡤⡶⣖⡒⡗⠛⢿⡷⣶⣾⡿⠋⠙⠿⠟⠉⠑⠒⠂
+⠀⣰⠾⠛⠋⠹⢽⣿⡦⡮⣿⡇⣤⣤⡈⢻⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⢺⠋⠀⠀⠀⠀⠀⠘⣽⣵⣫⣿⡃⡼⠇⣸⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠸⠀⠀⠀⠀⠀⠀⠀⠀⣿⡟⣿⠛⢊⡽⠿⠛⠿⣶⣦⣄⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣻⣯⡱⠁⠀⠀⠀⠀⠀⠈⢿⣧⡀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⢰⡿⠡⣟⠇⠀⠀⠀⢀⣀⡀⠀⠸⣿⡇⠀⠀⠀
+⠀⠀⠀⠈⠢⠶⠤⠞⠋⠁⢸⡏⠀⠀⢀⣿⠃⠀⠀⠀⢰⣧⠇⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣧⠀⠀⢨⡿⡀⠀⠀⣰⣿⠋⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⣿⠀⠀⠀⠙⠚⠷⠿⠟⠁⠀⠀⠀⠀⠀</pre>
+    <pre class="bg-sigil bg-sigil--ml bg-sigil--xl">
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣴⣿⣿⣿⣦⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⣿⣿⣿⣿⣿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠘⣿⣿⣿⠃⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀
+⠀⠀⠀⠀⣼⣷⣤⡀⠀⠀⠀⢹⣿⡏⠀⠀⠀⢀⣤⣾⣧⡀⠀⠀⠀
+⢠⣠⣴⣾⣿⣿⣿⣿⣿⣶⣶⣼⣿⣧⣶⣶⣿⣿⣿⣿⣿⣿⣦⣄⡤
+⠀⠀⠈⠻⣿⣿⣿⡿⠟⠛⠉⢹⣿⡏⠉⠙⠛⢿⣿⣿⣿⠟⠉⠀⠀
+⠀⠀⠀⠀⠸⠛⠁⠀⠀⠀⠀⣼⣿⣧⠀⠀⠀⠀⠈⠙⠏⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⢀⣼⣿⣿⣿⣿⣿⣷⠄⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⣿⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀</pre>
+    <pre class="bg-sigil bg-sigil--mr bg-sigil--lg">
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⣆⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠄⠀⠀⠀⠀⢀⡲⢷⠷⢧⣄⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⢠⠜⠁⠀⠀⠀⠀⠀⢠⣣⡓⡉⣧⠎⠋⢖⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⣰⠃⠀⠀⠀⠀⠀⠀⠀⠈⠉⢰⣻⣷⡦⠉⠁⠀⠀⠀⠀⠀
+⠀⠀⢀⣔⠦⣤⣇⠀⠀⠀⠀⠀⡆⠀⠀⠀⠀⠸⣙⣯⣡⠀⠀⡀⠀⠀⠀⠀
+⠀⠀⠈⠀⠀⢹⣧⣢⠀⠀⠀⠀⡇⠀⠀⠀⣤⠂⡟⡟⣈⡳⡀⠀⡀⠀⠀⠀
+⠀⠀⠀⠀⠛⠸⣻⡘⠀⡀⡀⣜⣇⡄⠀⠀⣧⡧⣿⣿⣿⣻⣇⠀⠄⠀⠀⠀
+⠐⠂⠐⢓⣶⢾⡿⣵⣖⡓⣒⢈⠛⣁⣞⣭⣏⣿⣿⣿⣦⣿⡕⣘⣥⡀⢠⡀
+⠀⠀⠀⠀⠀⠸⠂⠑⠋⠉⣳⣭⣿⡋⡹⠉⠠⠷⣿⣿⣶⣲⠓⣿⡟⠛⠛⠋
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⠿⠀⠟⣞⡌⠗⠀⢺⣞⢯⡇⠀⠈⠁⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⢰⣋⣂⣀⠀⠰⢷⠿⠁⠀⠀⣤⢺⢋⣁⠀⠀⠀⠀⠀⡄⠀
+⠀⠀⠀⠀⠀⣠⠛⠉⠀⣔⠛⣶⡟⡲⠀⠀⠀⢈⠸⣿⠃⠀⠀⠀⠀⠀⡇⠀
+⠀⠀⠀⠀⢰⠂⠀⠀⠀⡨⢭⢿⠋⡱⣀⡀⠀⢸⠀⡿⠀⠀⠀⠀⠀⠀⡆⠀
+⠀⠀⠀⠀⠸⠀⠀⠀⠀⠉⠀⢳⣧⡛⠉⠉⠳⡘⠀⡽⠈⡄⠀⡀⠀⢀⣇⠀</pre>
+  </div>
+
   <header class="site-header">
     <div class="site-header__inner">
       <div class="brand">
@@ -104,18 +158,20 @@
           <h3><span class="num">II.</span> &nbsp; Output</h3>
           <span id="status-badge" class="badge" data-state="idle">Enter text</span>
         </div>
-        <div id="preview-wrap" class="preview" hidden>
-          <div class="preview__frame">
-            <div class="preview__corners"></div>
-            <canvas id="preview-canvas"></canvas>
+        <div class="output-grid">
+          <div id="preview-wrap" class="preview" hidden>
+            <div class="preview__frame">
+              <div class="preview__corners"></div>
+              <canvas id="preview-canvas"></canvas>
+            </div>
           </div>
+          <dl class="meta-grid">
+            <dt>Version</dt><dd id="meta-version">·</dd>
+            <dt>Size</dt><dd id="meta-size">·</dd>
+            <dt>EC level</dt><dd id="meta-ec">·</dd>
+            <dt>Mask</dt><dd id="meta-mask">·</dd>
+          </dl>
         </div>
-        <dl class="meta-grid mt-6">
-          <dt>Version</dt><dd id="meta-version">·</dd>
-          <dt>Size</dt><dd id="meta-size">·</dd>
-          <dt>EC level</dt><dd id="meta-ec">·</dd>
-          <dt>Mask</dt><dd id="meta-mask">·</dd>
-        </dl>
       </section>
 
       <!-- III. ROUND-TRIP VERIFICATION --------------------------------- -->
@@ -142,6 +198,7 @@
             </div>
             <div class="damage__readout" id="damage-readout">
               <div><strong>Damage:</strong> <span id="damage-pct">0%</span> · <span id="damage-status">awaiting input</span></div>
+              <ul id="damage-decoders" class="check-list"></ul>
               <div class="text" id="damage-decoded">·</div>
             </div>
           </div>

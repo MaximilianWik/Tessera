@@ -7,6 +7,59 @@
 
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&display=swap');
 
+/* -- BACKGROUND SIGILS (large, faded, behind content) -------------------- */
+
+body { position: relative; }
+
+.bg-sigils {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.bg-sigil {
+  position: absolute;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 24px;
+  line-height: 0.95;
+  letter-spacing: 0;
+  white-space: pre;
+  color: var(--blood-1);
+  opacity: 0.045;
+  user-select: none;
+  font-weight: 400;
+  text-shadow: 0 0 30px var(--blood-glow);
+}
+.bg-sigil--lg { font-size: 32px; opacity: 0.04; }
+.bg-sigil--xl { font-size: 40px; opacity: 0.035; }
+
+.bg-sigil--tr  { top: 540px;  right: -120px; transform: rotate(6deg); }
+.bg-sigil--ml  { top: 1500px; left: -160px;  transform: rotate(-4deg); }
+.bg-sigil--mr  { top: 2400px; right: -180px; transform: rotate(3deg); }
+.bg-sigil--bl  { top: 3400px; left: -120px;  transform: rotate(-7deg); }
+
+[data-page="tests"] .bg-sigil--tr { top: 600px; }
+[data-page="tests"] .bg-sigil--ml { top: 1300px; }
+[data-page="permanence"] .bg-sigil--mr { top: 3000px; }
+[data-page="permanence"] .bg-sigil--bl { top: 4400px; }
+
+.site-header,
+.hero,
+.shell,
+.image-strip,
+.site-footer,
+.test-page {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 720px) {
+  .bg-sigils { display: none; }
+}
+
 /* -- TOKENS ----------------------------------------------------------------- */
 
 :root {
@@ -513,6 +566,30 @@ select {
   font-family: var(--font-mono);
   color: var(--bone-1);
   font-weight: 500;
+}
+
+/* Output panel internal layout: canvas on the left, metadata on the right.
+   Mirrors the damage panel's internal split so both QRs land at the same
+   x-position on desktop (left column of a 2-col layout inside the panel). */
+.output-grid {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 720px) {
+  .output-grid { grid-template-columns: 1fr; gap: 18px; }
+}
+
+/* Damage decoders inline list (matches round-trip check-list visuals but
+   tighter padding so it fits within the readout column.) */
+#damage-decoders {
+  margin: 8px 0 0;
+}
+#damage-decoders li {
+  padding: 4px 8px;
+  font-size: 11px;
+  margin-bottom: 2px;
 }
 
 /* -- STATUS BADGE ----------------------------------------------------------- */
