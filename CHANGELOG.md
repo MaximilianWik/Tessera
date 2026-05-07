@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-05-07
 
+#### Run 11: cathedral/cross sigil swapped, tolerance log moved under the slider, bg sigil visibility fixed
+
+User feedback after run 10: the background sigils I added in runs 9 and 10 weren't actually visible (opacity 0.045 against a near-black background rendered them basically invisible), the damage preview's two columns made the QR codes look mismatched against the Output panel above, the user didn't like the cathedral/cross dot-art piece I'd been using, and the tolerance log belonged with the slider, not with the decoders.
+
+Changed:
+
+- **Background sigil opacity** bumped from 0.045 to 0.22 (5x more visible). Added `mix-blend-mode: screen` for additive blending against the black ground, plus a stronger `text-shadow` glow. Pulled positions inward (e.g. `right: -120px` to `right: -40px`) so more of each sigil sits in the visible page margins around the centred shell rather than mostly clipped offscreen. The background pieces are now genuinely visible peeking from behind/around the panels.
+- **Damage preview restructured to 3 columns** (canvas | slider/buttons | decoder status), per the user's layout sketch. Column 1: QR canvas with a `Damage / N%` indicator beneath. Column 2: blur level label, 7 preset buttons, slider, hint text, **and the tolerance log** (PASS line + per-level OK/FAIL table). Column 3: status callout, per-decoder check-list, decoded URL. Below 1100 px the decoder column drops to a full-width row beneath the canvas + slider; below 720 px everything stacks single-column.
+- **Cathedral/cross dot-art replaced with the angular flowing sigil** (sourced from emojicombos.com/sigil) wherever it appeared: index hero, index `bg-sigil--ml` (large), permanence `bg-sigil--mr` (large), tests `bg-sigil--tr` (large). The new piece is a two-segment flowing glyph connected by a horizontal joint, less religious-looking than a cross.
+- New CSS rules: `.damage__canvas-col`, `.damage__slider-col`, `.damage__decoder-col` (the 3-column flex children); `.damage__pct-line` + `.damage__pct-value` (the damage-percent indicator under the canvas); `.damage__status-line` (the callout box at the top of column 3). Old `.damage__stage`, `.damage__readout`, `.damage__controls` rules deleted; their replacements live in the new column classes.
+
+Verified:
+
+- 93/93 tests still green.
+- Output canvas (panel II) and Damage canvas (panel IV) now both sit in the left column of a 2-col / 3-col internal layout respectively, at the same x-position on desktop. Same module size, same visual weight.
+- Background sigils visible at 1440 px viewport: pieces peek from the right and left page margins around the centred shell, faded but readable in the black space.
+- Tolerance log now sits under the slider hint in column 2 of the damage preview; column 3 is decoders + decoded text only.
+
 #### Run 10: panel alignment, decoder check-list in damage preview, large background sigils
 
 Three things from the user's feedback. The two QR canvases on desktop were not aligned (Output canvas centered in its panel; Damage canvas was further right because its panel spans both columns). The damage preview only reported a single rolled-up verdict, but the round-trip panel had taught the user to expect a per-decoder breakdown. And the page wanted more atmospheric ASCII art beyond the hero sigils.
