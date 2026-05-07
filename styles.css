@@ -40,15 +40,22 @@ body { position: relative; }
 /* Position sigils so they peek out from the margins of the centred shell
    (max-width 1280 px, so ~80–160 px of empty page on each side at 1440+),
    rather than sitting fully behind opaque panels where they'd be hidden. */
-.bg-sigil--tr  { top: 600px;  right: -40px;  transform: rotate(6deg); }
-.bg-sigil--ml  { top: 1500px; left: -60px;   transform: rotate(-4deg); }
-.bg-sigil--mr  { top: 2400px; right: -80px;  transform: rotate(3deg); }
-.bg-sigil--bl  { top: 3400px; left: -50px;   transform: rotate(-7deg); }
+.bg-sigil--tr  { top: 540px;  right: -40px;  transform: rotate(6deg); }
+.bg-sigil--tl  { top: 760px;  left: -50px;   transform: rotate(-5deg); }
+.bg-sigil--uml { top: 1100px; left: -70px;   transform: rotate(8deg); }
+.bg-sigil--umr { top: 1320px; right: -60px;  transform: rotate(-4deg); }
+.bg-sigil--ml  { top: 1700px; left: -60px;   transform: rotate(-4deg); }
+.bg-sigil--mr  { top: 2150px; right: -80px;  transform: rotate(3deg); }
+.bg-sigil--lml { top: 2620px; left: -55px;   transform: rotate(5deg); }
+.bg-sigil--lmr { top: 2980px; right: -70px;  transform: rotate(-6deg); }
+.bg-sigil--bl  { top: 3450px; left: -50px;   transform: rotate(-7deg); }
+.bg-sigil--br  { top: 3850px; right: -60px;  transform: rotate(2deg); }
 
 [data-page="tests"] .bg-sigil--tr { top: 480px; }
 [data-page="tests"] .bg-sigil--ml { top: 1100px; }
 [data-page="permanence"] .bg-sigil--mr { top: 3000px; }
 [data-page="permanence"] .bg-sigil--bl { top: 4400px; }
+[data-page="permanence"] .bg-sigil--br { top: 4900px; }
 
 .site-header,
 .hero,
@@ -378,10 +385,12 @@ strong, b { font-weight: 700; color: var(--bone-0); }
 
 .panel {
   position: relative;
-  background: var(--ink-1);
+  background: rgba(7, 7, 10, 0.88);
   border: var(--thick) solid var(--ink-5);
   padding: 24px;
   margin: 0 0 24px;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 .panel__hd {
   display: flex;
@@ -1318,6 +1327,101 @@ button.btn, .btn {
   font-size: 10px;
   letter-spacing: 0.16em;
 }
+
+/* -- ABOUT THE NAME (permanence page mosaic interlude) -------------------- */
+
+.about-name {
+  margin-top: 32px;
+}
+.about-name__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 4fr);
+  gap: 32px;
+  align-items: start;
+}
+@media (max-width: 920px) {
+  .about-name__grid { grid-template-columns: 1fr; gap: 22px; }
+}
+
+.about-name__figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.about-name__frame {
+  position: relative;
+  padding: 8px;
+  background: var(--ink-0);
+  border: 2px solid var(--ink-5);
+  box-shadow: 0 0 0 1px var(--blood-3), 0 0 0 4px var(--ink-0), 0 0 0 5px var(--blood-2);
+}
+.about-name__frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: contrast(1.06) saturate(0.92) brightness(0.96);
+}
+.about-name__frame .preview__corners::before,
+.about-name__frame .preview__corners::after {
+  width: 18px;
+  height: 18px;
+  border-width: 2px;
+}
+.about-name__figure figcaption {
+  font-size: 11px;
+  color: var(--bone-3);
+  line-height: 1.55;
+  font-style: italic;
+  padding: 4px 2px;
+}
+.about-name__figure figcaption strong {
+  color: var(--bone-1);
+  font-style: normal;
+  letter-spacing: 0.04em;
+}
+.about-name__cap-tag {
+  display: block;
+  font-style: normal;
+  font-size: 9px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--blood-1);
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.about-name__body p {
+  color: var(--bone-2);
+  line-height: 1.7;
+  font-size: 14px;
+}
+.about-name__body em {
+  color: var(--blood-0);
+  font-style: italic;
+  font-weight: 600;
+}
+.about-name__pullquote {
+  margin: 18px 0;
+  padding: 16px 20px;
+  border-left: 3px solid var(--blood-1);
+  background: linear-gradient(90deg, rgba(196, 30, 38, 0.10), rgba(196, 30, 38, 0.02) 70%, transparent);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--bone-0);
+  letter-spacing: -0.005em;
+  line-height: 1.4;
+  position: relative;
+}
+.about-name__pullquote::before,
+.about-name__pullquote::after {
+  color: var(--blood-1);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+.about-name__pullquote::before { content: "“ "; }
+.about-name__pullquote::after  { content: " ”"; }
 
 /* =============================================================================
    MOBILE: tighten spacing, prevent overflow, scale type down
