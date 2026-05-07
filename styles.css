@@ -23,26 +23,30 @@ body { position: relative; }
   position: absolute;
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 24px;
+  font-size: 26px;
   line-height: 0.95;
   letter-spacing: 0;
   white-space: pre;
   color: var(--blood-1);
-  opacity: 0.045;
+  opacity: 0.22;
   user-select: none;
   font-weight: 400;
-  text-shadow: 0 0 30px var(--blood-glow);
+  text-shadow: 0 0 24px var(--blood-glow), 0 0 8px var(--blood-glow);
+  mix-blend-mode: screen;
 }
-.bg-sigil--lg { font-size: 32px; opacity: 0.04; }
-.bg-sigil--xl { font-size: 40px; opacity: 0.035; }
+.bg-sigil--lg { font-size: 36px; opacity: 0.18; }
+.bg-sigil--xl { font-size: 48px; opacity: 0.14; }
 
-.bg-sigil--tr  { top: 540px;  right: -120px; transform: rotate(6deg); }
-.bg-sigil--ml  { top: 1500px; left: -160px;  transform: rotate(-4deg); }
-.bg-sigil--mr  { top: 2400px; right: -180px; transform: rotate(3deg); }
-.bg-sigil--bl  { top: 3400px; left: -120px;  transform: rotate(-7deg); }
+/* Position sigils so they peek out from the margins of the centred shell
+   (max-width 1280 px, so ~80–160 px of empty page on each side at 1440+),
+   rather than sitting fully behind opaque panels where they'd be hidden. */
+.bg-sigil--tr  { top: 600px;  right: -40px;  transform: rotate(6deg); }
+.bg-sigil--ml  { top: 1500px; left: -60px;   transform: rotate(-4deg); }
+.bg-sigil--mr  { top: 2400px; right: -80px;  transform: rotate(3deg); }
+.bg-sigil--bl  { top: 3400px; left: -50px;   transform: rotate(-7deg); }
 
-[data-page="tests"] .bg-sigil--tr { top: 600px; }
-[data-page="tests"] .bg-sigil--ml { top: 1300px; }
+[data-page="tests"] .bg-sigil--tr { top: 480px; }
+[data-page="tests"] .bg-sigil--ml { top: 1100px; }
 [data-page="permanence"] .bg-sigil--mr { top: 3000px; }
 [data-page="permanence"] .bg-sigil--bl { top: 4400px; }
 
@@ -675,18 +679,57 @@ select {
 
 .damage {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
-  gap: 24px;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
   align-items: start;
 }
-@media (max-width: 720px) { .damage { grid-template-columns: 1fr; } }
+@media (max-width: 1100px) {
+  .damage { grid-template-columns: auto minmax(0, 1fr); }
+  .damage__decoder-col { grid-column: 1 / -1; }
+}
+@media (max-width: 720px) { .damage { grid-template-columns: 1fr; gap: 20px; } }
 
-.damage__stage {
+.damage__canvas-col,
+.damage__slider-col,
+.damage__decoder-col {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 14px;
+  gap: 12px;
+  min-width: 0;
 }
+
+.damage__pct-line {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 0 0;
+  border-top: 1px solid var(--ink-5);
+}
+.damage__pct-label {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--bone-3);
+  font-weight: 700;
+}
+.damage__pct-value {
+  font-size: 18px;
+  color: var(--bone-0);
+  font-weight: 800;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+.damage__status-line {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--bone-2);
+  padding: 8px 10px;
+  background: var(--ink-2);
+  border-left: 3px solid var(--ink-5);
+}
+.damage__status-line .good { color: var(--ok); }
+.damage__status-line .bad  { color: var(--bad); }
 .damage__canvas-wrap {
   position: relative;
   background: var(--bone-0);
@@ -718,11 +761,6 @@ select {
 .damage__verdict[data-state="ok"]   { color: var(--ok);    border-color: var(--ok); }
 .damage__verdict[data-state="fail"] { color: var(--blood-0); border-color: var(--blood-1); background: rgba(255,45,58,0.06); }
 
-.damage__controls {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
 .damage__levels {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -785,24 +823,19 @@ select {
   border-radius: 0;
 }
 .damage__slider:active::-webkit-slider-thumb { cursor: grabbing; box-shadow: 0 0 16px var(--blood-glow); }
-.damage__readout {
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: var(--bone-3);
-}
-.damage__readout strong { color: var(--bone-0); }
-.damage__readout .text {
+
+.damage__decoder-col .text {
   display: block;
-  margin-top: 6px;
   padding: 8px 10px;
   background: var(--ink-3);
   border-left: 3px solid var(--ink-5);
   color: var(--bone-1);
   font-family: var(--font-mono);
+  font-size: 11px;
   word-break: break-all;
 }
-.damage__readout .text.ok   { border-left-color: var(--ok); }
-.damage__readout .text.fail { border-left-color: var(--bad); color: var(--bone-3); }
+.damage__decoder-col .text.ok   { border-left-color: var(--ok); }
+.damage__decoder-col .text.fail { border-left-color: var(--bad); color: var(--bone-3); }
 
 /* -- DAMAGE TABLE ----------------------------------------------------------- */
 
@@ -1322,8 +1355,8 @@ button.btn, .btn {
   .damage__levels { gap: 3px; }
   .damage__levels button { font-size: 10px; padding: 6px 0; letter-spacing: 0; }
   .damage__verdict { padding: 5px 10px; font-size: 10px; letter-spacing: 0.12em; }
-  .damage__readout { font-size: 11px; }
-  .damage__readout .text { font-size: 10px; padding: 6px 8px; }
+  .damage__decoder-col .text { font-size: 10px; padding: 6px 8px; }
+  .damage__pct-value { font-size: 16px; }
 
   /* Tattoo table: drop the fixed widths that caused horizontal overflow. */
   .tattoo-table th:nth-child(2),
