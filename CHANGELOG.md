@@ -9,6 +9,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-05-07
 
+#### Run 14: tattoo size grades bumped to match practitioner consensus + EC primer panel
+
+Two unrelated improvements that landed together. First: a research pass against tattoo-artist guidance, QR-vendor sizing recommendations, and tattoo ink-bleed data revealed that the previous "Recommended 1.2 mm/module" grade was too aggressive for a tattoo meant to last decades. Practitioner consensus (multiple tattoo artists, Scanova's QR-tattoo guide, QRCodeChimp) clusters around **5 cm side length minimum**, and TatSpark's ink-expansion data (~20% per 5 years) plus the project's own blur-tolerance ceiling (30% blur ≈ nearly a full module) imply that a 0.3-0.5 mm absolute bleed over 30 years exceeds the 1.2 mm grade's headroom. Second: panel I (Input) had a large empty area to the right of the EC dropdown; it now carries a compact "EC primer" side panel explaining what error correction is, the four levels, and the codeword-vs-area gotcha.
+
+Changed (tattoo size grades, in `src/app.js` and `src/spec-sheet.js`):
+
+| Grade | Old mm/module | **New mm/module** | v3 total side (29 modules + 4-px quiet zone each side, 37×37 effective) | Old label | New label |
+|---|---|---|---|---|---|
+| Minimum | 0.7 | **1.0** | 37 mm | "Minimum (still scans)" | "Minimum (today-scannable)" |
+| Recommended | 1.2 | **1.7** | 63 mm | "Recommended (ASK FOR THIS)" | "Recommended (ASK FOR THIS)" — same |
+| Conservative | 1.8 | **2.2** | 81 mm | "Conservative (large, durable)" | "Conservative (50+ year margin)" |
+
+(For a v2 / 25-module QR with quiet zone the new sides are 33 / 56 / 73 mm respectively. The recommended grade lands a typical-URL QR very close to the 5 cm practitioner-consensus floor.)
+
+- **`GRADES` array in `src/app.js`** (the in-app tattoo-recommendations panel) and **`TATTOO_GRADES` in `src/spec-sheet.js`** (the printable spec sheet) updated together. Hint copy for each grade rewritten:
+  - Min: "Scans now, but not engineered to last. Plan on a touch-up within 10-15 years if you go this small."
+  - Rec: "Lands at ~5 cm side length, the practitioner-consensus floor for tattoo QR codes. Comfortable to scan, robust to decades of ink bleed."
+  - Cons: "Generous margin against worst-case ink bleed and skin stretch. Best for forearm, calf, or back placements meant to outlast you."
+- New **`REC_MM` constant** (= 1.7) in `src/app.js` so the "show the artist this size" headline and the optimal-callout side-by-side comparison always agree with the recommended-grade row of the table. Replaced two hard-coded `1.2` literals.
+- **Tattoo-specs panel hint** (`index.html`, panel V) extended: "Module size determines whether your phone can read the tattoo, and how well it withstands skin stretch and ink bleed over decades. Show the artist the recommended size below; placement (forearm, calf, upper back) matters as much as size."
+- **New placement + touch-up paragraph** rendered below the tattoo-recommendations table: "Placement matters as much as size. Forearm, calf, and upper back hold up far better than stomach, inner wrist, or anywhere with high skin stretch. Plan on a touch-up every 10-15 years to keep edges crisp; even at the conservative size, no tattoo lasts a lifetime untouched."
+- **Spec-sheet prose** (`src/spec-sheet.js`) updated to mention the 5 cm practitioner consensus, the 1.7 mm recommended grade, and the 10-15 year touch-up cadence.
+
+Fixed (stale doc bug caught while editing the same file):
+
+- **`src/spec-sheet.js:183`** had `radius = (severity / 100) × module-pixel-size × 0.5` — the same wrong multiplier that was fixed in `permanence.html` and `docs/PERMANENCE.md` in run 13. The actual code in `src/damage-preview.js:69` uses `× 3`. Spec-sheet copy now matches: "(severity / 100) × module-pixel-size × 3", with the 30% description corrected from "severe ink bleed" to "severe ink bleed (nearly a full module of blur)". Also `gaussian` → `Gaussian`.
+
+Added (EC primer side panel, `index.html` panel I):
+
+- **New `<aside class="ec-primer">`** to the right of the EC dropdown inside panel I (Input). Compact reference card with: a `𓌹  EC PRIMER  𓌺` blood-red tag header, a one-sentence definition of error correction (Reed-Solomon redundancy), a four-row L/M/Q/H grid showing recovery percentage and one-phrase use case for each level, and a footnote explaining that the percentages are codeword-level (not visual area) and that concentrated damage exhausts a single block's correction budget before reaching the headline number.
+- **New `.ec-row` grid wrapper** in `index.html` (the EC field's parent) — `grid-template-columns: minmax(0, 380px) 1fr` so the existing 380 px-wide EC field holds its size on the left and the primer fills the rest of the panel on the right. Stacks single-column below 920 px.
+- **New CSS rules in `styles.css`** (~80 lines): `.ec-row`, `.ec-primer` (bordered card with a 2-px blood-red `::before` left bar at 60% opacity, matching `.optimal-callout`'s accent treatment, plus a faint blood-red gradient backdrop fading to transparent at 60%), `.ec-primer__tag`, `.ec-primer__grid` (DL with 22-px first column for the L/M/Q/H letter and a sub-grid in the second column for the percentage + use case), `.ec-primer__pct` (tabular-nums for column alignment), `.ec-primer__note`.
+
+Verified:
+
+- 93/93 tests still green (headless Chromium via Playwright).
+- HTML balanced across `index.html` / `permanence.html` / `tests.html`.
+- `fmtCm(modulesPerSide * REC_MM)` in the headline render now agrees with the recommended-grade row of the table for every QR version (no more 1.2 vs. 1.2 hard-coded mismatch risk if the recommended target ever changes again).
+- No remaining `0.7` / `1.2` / `1.8` literals in `src/app.js` or `src/spec-sheet.js` (other than legitimate non-mm uses verified by grep).
+- The previously stale `× 0.5` blur multiplier is now gone from every doc and code path: `permanence.html` (run 13), `docs/PERMANENCE.md` (run 13), `src/spec-sheet.js` (this run). The actual `× 3` code in `src/damage-preview.js:69` is unchanged and remains the source of truth.
+
+Notes / context:
+
+- The size bump is justified by **practitioner consensus**, not peer-reviewed dermatology. There's no academic study quantifying QR-scale ink-bleed-vs-time on tattooed skin; the figures come from professional artists and tattoo-science educational sites. Treated as an engineering floor, not gospel.
+- The blur damage model (the project's own engineered tolerance) and the new size grades are now consistent with each other: a 1.7 mm/module QR at level Q (Tessera's tattoo-optimal default for short URLs) has roughly 0.5 mm = 29% of a module of headroom against the 30% blur ceiling, which matches a realistic 30-year ink-bleed estimate. The old 1.2 mm recommended grade had only 42% of a module of bleed budget at the same 0.5 mm absolute, which crossed the 30% wall.
+- The EC primer addition is purely an information-density improvement; no behavior changes. The previous panel-I right-of-dropdown space was empty.
+
 #### Run 13: background sigils removed entirely; full grammar/spelling sweep across site and docs
 
 The bg-sigils experiment (introduced in run 10 and refined through runs 11–12) didn't land aesthetically. This run pulls them out completely and uses the moment to do a top-to-bottom prose pass across every user-facing page and the two `docs/` files, fixing both lint-grade nits and one substantive content drift: the README and `docs/PERMANENCE.md` were still describing the old square-blot damage model even though the actual code, the live preview, and `permanence.html` had all migrated to the Gaussian-blur model in run 6+.

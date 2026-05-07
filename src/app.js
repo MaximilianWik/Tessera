@@ -226,15 +226,22 @@
 
   // -- Tattoo recommendations -------------------------------------------------
 
-  // Module size guidance, in millimetres per module.
-  //   Min:    smallest size still reliably scannable on a phone (~0.7 mm)
-  //   Rec:    Tessera's recommended size — robust to a decade of normal blur
-  //   Cons:   conservative, ages best, much more forgiving of misink
+  // Module size guidance, in millimetres per module. Sized for tattoos that
+  // need to remain scannable for decades, factoring in 30-year ink bleed of
+  // ~0.3-0.5 mm per line edge. Practitioner consensus (tattoo artists, QR
+  // tattoo vendors): ~5 cm total side length is the safe minimum for tattoos.
+  //   Min:    smallest size that scans on a phone today (2 cm rule); not
+  //           aging-proof. Will likely need a touch-up within 10-15 years.
+  //   Rec:    lands a typical-URL QR at ~5 cm — matches pro-tattoo guidance.
+  //   Cons:   generous margin against worst-case bleed and skin variation.
   var GRADES = [
-    { id: 'min',  label: 'Minimum (still scans)',           mm: 0.7, hint: 'Smallest size that still reliably scans on a phone today. Ages worst.' },
-    { id: 'rec',  label: 'Recommended (ASK FOR THIS)',      mm: 1.2, hint: 'Tessera\'s recommended size. Comfortable to scan, ages well, fits most placements.' },
-    { id: 'cons', label: 'Conservative (large, durable)',   mm: 1.8, hint: 'Most forgiving to ink bleed and skin stretch. Best choice for forearm, calf, back.' },
+    { id: 'min',  label: 'Minimum (today-scannable)',       mm: 1.0, hint: 'Scans now, but not engineered to last. Plan on a touch-up within 10-15 years if you go this small.' },
+    { id: 'rec',  label: 'Recommended (ASK FOR THIS)',      mm: 1.7, hint: 'Lands at ~5 cm side length, the practitioner-consensus floor for tattoo QR codes. Comfortable to scan, robust to decades of ink bleed.' },
+    { id: 'cons', label: 'Conservative (50+ year margin)',  mm: 2.2, hint: 'Generous margin against worst-case ink bleed and skin stretch. Best for forearm, calf, or back placements meant to outlast you.' },
   ];
+
+  // The size shown to the artist as the headline recommendation.
+  var REC_MM = 1.7;
 
   function fmtCm(mm)  { return (mm / 10).toFixed(1) + ' cm'; }
   function fmtMm(mm)  { return mm.toFixed(1).replace(/\.0$/, '') + ' mm'; }
@@ -263,10 +270,10 @@
 
     var optimalCallout = '';
     if (optimal && !isOptimal) {
-      // Compute module size delta at the recommended (1.2 mm) target.
-      var currentSideMm = modulesPerSide * 1.2;
+      // Compute module size delta at the recommended target.
+      var currentSideMm = modulesPerSide * REC_MM;
       var optimalModulesPerSide = optimal.version * 4 + 17 + 8; // size = 4V+17, plus quiet zone
-      var optimalSideMm = optimalModulesPerSide * 1.2;
+      var optimalSideMm = optimalModulesPerSide * REC_MM;
       var moduleSizePctBigger = ((modulesPerSide / optimalModulesPerSide) - 1) * 100;
       optimalCallout =
         '<div class="optimal-callout">' +
@@ -289,7 +296,8 @@
       '<table class="tattoo-table mt-4"><thead><tr><th>Quality</th><th>Module</th><th>Tattoo size</th></tr></thead><tbody>'
       + rows
       + '</tbody></table>'
-      + '<p class="muted small mt-2">Show the artist the recommended <strong>' + fmtCm(modulesPerSide * 1.2) + '</strong> size. Smaller is harder to scan and ages worse. Bigger is fine. The quiet zone (white margin) is part of the spec; the artist must not crop it out.</p>';
+      + '<p class="muted small mt-2">Show the artist the recommended <strong>' + fmtCm(modulesPerSide * REC_MM) + '</strong> size. Smaller is harder to scan and ages worse; bigger is always fine. The quiet zone (white margin) is part of the spec; the artist must not crop it out.</p>'
+      + '<p class="muted small mt-2"><strong>Placement matters as much as size.</strong> Forearm, calf, and upper back hold up far better than stomach, inner wrist, or anywhere with high skin stretch. Plan on a touch-up every 10-15 years to keep edges crisp; even at the conservative size, no tattoo lasts a lifetime untouched.</p>';
 
     // Wire apply button if shown
     var $apply = document.getElementById('btn-apply-optimal');
