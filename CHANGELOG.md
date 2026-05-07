@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-05-07
 
+#### Run 12: "About the name" section ported into the permanence page (with the Hagia Sophia mosaic)
+
+The README's "About the name" section explains why Tessera is called Tessera: a tessera is the small stone or glass tile a mosaic is built from, and a QR code is a mosaic. The Hagia Sophia detail image grounds the metaphor visually. That context lived in the README only; the live site never showed it. This run promotes it onto the permanence page, where the historical anchor sits well between "The premise" and Layer I, pivoting from the technical stakes to the conceptual frame before the doctrine begins.
+
+Added:
+
+- **`<section class="panel panel--blood about-name">`** in `permanence.html`, positioned between "The premise" panel and Layer I. Two-column layout on desktop, single-column on mobile (collapse at 920 px). Left column: the `hagia_sophia_tessera.jpg` image inside a custom triple-layered frame (`.about-name__frame` with stacked `box-shadow` rings of black / blood-red / black / blood-red), wrapped in `.preview__corners` cyber bracket markers, with a small `𓌹  ARTEFACT  𓌺` tag-line above the caption noting the date (circa 886-912 CE). Right column: the same prose as the README, with the punchy line "A QR code is a mosaic. Each module is a tessera; the message is the picture they make together." pulled out as a styled `<blockquote class="about-name__pullquote">` with blood-red side bar, gradient backdrop, and curly quotation marks rendered as `::before`/`::after` decorations.
+- New CSS rules: `.about-name__grid` (5fr / 4fr 2-col grid), `.about-name__frame` (the layered shadow-ring image frame with cyber brackets), `.about-name__figure` + `.about-name__cap-tag` (caption typography), `.about-name__body` + `.about-name__pullquote` (prose styling, with `<em>` rendered in blood-red to highlight *tessera* and *tesserae* on first use). Image gets a subtle `filter: contrast(1.06) saturate(0.92)` so it sits a little quieter against the dark page without losing the mosaic's gold-leaf colour.
+
+Verified:
+
+- 93/93 tests still green.
+- New section renders cleanly at 1440 px (2-col) and 375 px (single-col stack). Image, caption, prose, pull-quote, and follow-up prose all flow correctly.
+- README's "About the name" section unchanged; the live-site version is a port, not a move (so GitHub README still has the same content for repo browsers).
+
 #### Run 11: cathedral/cross sigil swapped, tolerance log moved under the slider, bg sigil visibility fixed
 
 User feedback after run 10: the background sigils I added in runs 9 and 10 weren't actually visible (opacity 0.045 against a near-black background rendered them basically invisible), the damage preview's two columns made the QR codes look mismatched against the Output panel above, the user didn't like the cathedral/cross dot-art piece I'd been using, and the tolerance log belonged with the slider, not with the decoders.
