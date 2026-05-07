@@ -7,70 +7,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&display=swap');
 
-/* -- BACKGROUND SIGILS (large, faded, behind content) -------------------- */
-
-body { position: relative; }
-
-.bg-sigils {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.bg-sigil {
-  position: absolute;
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: 32px;
-  line-height: 0.95;
-  letter-spacing: 0;
-  white-space: pre;
-  color: var(--blood-1);
-  opacity: 0.55;
-  user-select: none;
-  font-weight: 400;
-  text-shadow: 0 0 32px var(--blood-glow), 0 0 12px var(--blood-glow);
-  mix-blend-mode: screen;
-}
-.bg-sigil--lg { font-size: 44px; opacity: 0.48; }
-.bg-sigil--xl { font-size: 56px; opacity: 0.40; }
-
-/* Position sigils so they peek out from the margins of the centred shell
-   (max-width 1280 px, so ~80–160 px of empty page on each side at 1440+),
-   rather than sitting fully behind opaque panels where they'd be hidden. */
-.bg-sigil--tr  { top: 540px;  right: -40px;  transform: rotate(6deg); }
-.bg-sigil--tl  { top: 760px;  left: -50px;   transform: rotate(-5deg); }
-.bg-sigil--uml { top: 1100px; left: -70px;   transform: rotate(8deg); }
-.bg-sigil--umr { top: 1320px; right: -60px;  transform: rotate(-4deg); }
-.bg-sigil--ml  { top: 1700px; left: -60px;   transform: rotate(-4deg); }
-.bg-sigil--mr  { top: 2150px; right: -80px;  transform: rotate(3deg); }
-.bg-sigil--lml { top: 2620px; left: -55px;   transform: rotate(5deg); }
-.bg-sigil--lmr { top: 2980px; right: -70px;  transform: rotate(-6deg); }
-.bg-sigil--bl  { top: 3450px; left: -50px;   transform: rotate(-7deg); }
-.bg-sigil--br  { top: 3850px; right: -60px;  transform: rotate(2deg); }
-
-[data-page="tests"] .bg-sigil--tr { top: 480px; }
-[data-page="tests"] .bg-sigil--ml { top: 1100px; }
-[data-page="permanence"] .bg-sigil--mr { top: 3000px; }
-[data-page="permanence"] .bg-sigil--bl { top: 4400px; }
-[data-page="permanence"] .bg-sigil--br { top: 4900px; }
-
-.site-header,
-.hero,
-.shell,
-.image-strip,
-.site-footer,
-.test-page {
-  position: relative;
-  z-index: 1;
-}
-
-@media (max-width: 720px) {
-  .bg-sigils { display: none; }
-}
-
 /* -- TOKENS ----------------------------------------------------------------- */
 
 :root {
@@ -385,12 +321,10 @@ strong, b { font-weight: 700; color: var(--bone-0); }
 
 .panel {
   position: relative;
-  background: rgba(7, 7, 10, 0.88);
+  background: var(--ink-1);
   border: var(--thick) solid var(--ink-5);
   padding: 24px;
   margin: 0 0 24px;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
 }
 .panel__hd {
   display: flex;
