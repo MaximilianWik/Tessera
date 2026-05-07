@@ -40,15 +40,22 @@ body { position: relative; }
 /* Position sigils so they peek out from the margins of the centred shell
    (max-width 1280 px, so ~80–160 px of empty page on each side at 1440+),
    rather than sitting fully behind opaque panels where they'd be hidden. */
-.bg-sigil--tr  { top: 600px;  right: -40px;  transform: rotate(6deg); }
-.bg-sigil--ml  { top: 1500px; left: -60px;   transform: rotate(-4deg); }
-.bg-sigil--mr  { top: 2400px; right: -80px;  transform: rotate(3deg); }
-.bg-sigil--bl  { top: 3400px; left: -50px;   transform: rotate(-7deg); }
+.bg-sigil--tr  { top: 540px;  right: -40px;  transform: rotate(6deg); }
+.bg-sigil--tl  { top: 760px;  left: -50px;   transform: rotate(-5deg); }
+.bg-sigil--uml { top: 1100px; left: -70px;   transform: rotate(8deg); }
+.bg-sigil--umr { top: 1320px; right: -60px;  transform: rotate(-4deg); }
+.bg-sigil--ml  { top: 1700px; left: -60px;   transform: rotate(-4deg); }
+.bg-sigil--mr  { top: 2150px; right: -80px;  transform: rotate(3deg); }
+.bg-sigil--lml { top: 2620px; left: -55px;   transform: rotate(5deg); }
+.bg-sigil--lmr { top: 2980px; right: -70px;  transform: rotate(-6deg); }
+.bg-sigil--bl  { top: 3450px; left: -50px;   transform: rotate(-7deg); }
+.bg-sigil--br  { top: 3850px; right: -60px;  transform: rotate(2deg); }
 
 [data-page="tests"] .bg-sigil--tr { top: 480px; }
 [data-page="tests"] .bg-sigil--ml { top: 1100px; }
 [data-page="permanence"] .bg-sigil--mr { top: 3000px; }
 [data-page="permanence"] .bg-sigil--bl { top: 4400px; }
+[data-page="permanence"] .bg-sigil--br { top: 4900px; }
 
 .site-header,
 .hero,
@@ -378,10 +385,12 @@ strong, b { font-weight: 700; color: var(--bone-0); }
 
 .panel {
   position: relative;
-  background: var(--ink-1);
+  background: rgba(7, 7, 10, 0.88);
   border: var(--thick) solid var(--ink-5);
   padding: 24px;
   margin: 0 0 24px;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 .panel__hd {
   display: flex;
