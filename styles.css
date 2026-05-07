@@ -1319,6 +1319,101 @@ button.btn, .btn {
   letter-spacing: 0.16em;
 }
 
+/* -- ABOUT THE NAME (permanence page mosaic interlude) -------------------- */
+
+.about-name {
+  margin-top: 32px;
+}
+.about-name__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 4fr);
+  gap: 32px;
+  align-items: start;
+}
+@media (max-width: 920px) {
+  .about-name__grid { grid-template-columns: 1fr; gap: 22px; }
+}
+
+.about-name__figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.about-name__frame {
+  position: relative;
+  padding: 8px;
+  background: var(--ink-0);
+  border: 2px solid var(--ink-5);
+  box-shadow: 0 0 0 1px var(--blood-3), 0 0 0 4px var(--ink-0), 0 0 0 5px var(--blood-2);
+}
+.about-name__frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: contrast(1.06) saturate(0.92) brightness(0.96);
+}
+.about-name__frame .preview__corners::before,
+.about-name__frame .preview__corners::after {
+  width: 18px;
+  height: 18px;
+  border-width: 2px;
+}
+.about-name__figure figcaption {
+  font-size: 11px;
+  color: var(--bone-3);
+  line-height: 1.55;
+  font-style: italic;
+  padding: 4px 2px;
+}
+.about-name__figure figcaption strong {
+  color: var(--bone-1);
+  font-style: normal;
+  letter-spacing: 0.04em;
+}
+.about-name__cap-tag {
+  display: block;
+  font-style: normal;
+  font-size: 9px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--blood-1);
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.about-name__body p {
+  color: var(--bone-2);
+  line-height: 1.7;
+  font-size: 14px;
+}
+.about-name__body em {
+  color: var(--blood-0);
+  font-style: italic;
+  font-weight: 600;
+}
+.about-name__pullquote {
+  margin: 18px 0;
+  padding: 16px 20px;
+  border-left: 3px solid var(--blood-1);
+  background: linear-gradient(90deg, rgba(196, 30, 38, 0.10), rgba(196, 30, 38, 0.02) 70%, transparent);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--bone-0);
+  letter-spacing: -0.005em;
+  line-height: 1.4;
+  position: relative;
+}
+.about-name__pullquote::before,
+.about-name__pullquote::after {
+  color: var(--blood-1);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+.about-name__pullquote::before { content: "“ "; }
+.about-name__pullquote::after  { content: " ”"; }
+
 /* =============================================================================
    MOBILE: tighten spacing, prevent overflow, scale type down
    ============================================================================= */
