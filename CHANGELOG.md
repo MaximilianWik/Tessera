@@ -7,11 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### 2026-05-06
+### 2026-05-07
+
+#### Run 9: authentic cyber-sigilism dot-art (replacing the placeholder block-character sigils)
+
+The hero ASCII art on all three pages was replaced with authentic Unicode-braille dot-art pieces sourced from emojicombos.com/cyber-sigilism. The previous block-character sigils (built from `▓▒░█` / `╔═╗║`) read as generic "ASCII art" rather than cyber-sigilism specifically; the braille-pattern art is the actual aesthetic the genre is built on. Three distinct pieces: a cathedral / cross-rising figure on the generator, a winged-head figure on the diagnostics page, and a large winged sigil with a long vertical drip on the permanence doctrine. Plus symbol-string accents (𓌹 𓆩 𓆪 𓌺 ⛓ ✶ ♱ ⊹ ✦) threaded through the meta-rails, footer ASCII rules, section dividers, and the hero credit watermark.
+
+Added:
+
+- Three new dot-art hero sigils, all authored in Unicode braille block (U+2800-U+28FF). `index.html` gets a small ascending cathedral / cross figure; `tests.html` gets a winged head / bird figure; `permanence.html` gets a large winged sigil with a long vertical drip extending down the page.
+- Symbol-string accents on every page: `𓌹 𓆩 𓆪 𓌺` (Egyptian hieroglyph determinatives) replace the plain `▓` separators in every meta-rail; the footer ASCII rule reads `𓌹  ⛓  ✶  ♱  ✶  ⛓  𓆩  ⊹  ✦  ⊹  𓆪  ⛓  ✶  ♱  ✶  ⛓  𓌺`; the same chain is applied to the `.rule` section divider via its `::before` content; the hero credit watermark on the generator page now reads `𓌹  A TESSERA BY  𓌺` / `MAXIMILIAN WIKSTRÖM` / `⋆ ♱ ARCHITECT · MMXXVI ♱ ⋆`.
+
+Changed:
+
+- `.hero__sigil` styling: font-size dropped from 10 px to 9 px and line-height from 1.1 to 1.0 to render braille dot-art at the correct density (the dots stack into recognisable shapes only when adjacent rows have no extra spacing). Added `max-height: 360px; overflow: hidden;` so the 36-line winged-sigil-with-drip on the permanence page doesn't push past the hero into the meta-rail below.
+
+Notes:
+
+- Braille dot-art is the canonical medium for the cyber-sigilism aesthetic. The U+2800-2FF range encodes 256 distinct 2×4 dot patterns per character, which is what gives the genre its characteristic mid-density look. The pieces fall back gracefully (just unprintable squares) on any system without a braille-capable monospace font, but JetBrains Mono (the site's loaded font) renders them correctly, as do all the system mono fallbacks.
+- The pieces were sourced from a public ASCII art collection (emojicombos.com), which aggregates user submissions. Standard fair-use treatment for folk-art ASCII; no specific authorship claim is made.
 
 #### Run 8: blur-detection bug fix (iOS Safari < 17 silently no-ops ctx.filter)
 
-Run 7's mobile fix added a JS box-blur fallback for browsers without canvas filter support, gated on a `HAS_CTX_FILTER` detection. The detection had a subtle bug: it set `ctx.filter = 'blur(2px)'` and then read it back, expecting browsers without filter support to either throw or return a different value. iOS Safari before v17 does neither — assigning to a non-existent property silently creates a regular JS property on the context object, so reading it back returns the value that was set, the equality test passes, Tessera concludes filter is supported, takes the native path, and the blur silently does nothing. The user's "still doesn't work on mobile" report.
+Run 7's mobile fix added a JS box-blur fallback for browsers without canvas filter support, gated on a `HAS_CTX_FILTER` detection. The detection had a subtle bug: it set `ctx.filter = 'blur(2px)'` and then read it back, expecting browsers without filter support to either throw or return a different value. iOS Safari before v17 does neither; assigning to a non-existent property silently creates a regular JS property on the context object, so reading it back returns the value that was set, the equality test passes, Tessera concludes filter is supported, takes the native path, and the blur silently does nothing. The user's "still doesn't work on mobile" report.
 
 Changed:
 
@@ -20,7 +38,7 @@ Changed:
 Verified:
 
 - Headless Chrome with normal `ctx.filter`: detection returns true (pixel test reads non-zero), native path selected. Same as desktop today.
-- Headless Chrome with `ctx.filter` stubbed to no-op (simulating iOS Safari 16): detection returns false, JS box-blur fallback runs, blur actually applies — verified by ~190 000 pixels changed between 0% and 30% blur on the rendered canvas.
+- Headless Chrome with `ctx.filter` stubbed to no-op (simulating iOS Safari 16): detection returns false, JS box-blur fallback runs, blur actually applies. Verified by ~190 000 pixels changed between 0% and 30% blur on the rendered canvas.
 - 93/93 tests still green. Mobile-screenshot regression check at 375 px wide unchanged from run 7.
 
 #### Run 7: mobile fix (blur preview broken on iOS Safari, layout overflow)
