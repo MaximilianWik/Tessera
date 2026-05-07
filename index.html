@@ -88,15 +88,29 @@
           <textarea id="input-text" rows="2" autofocus spellcheck="false" autocorrect="off" autocapitalize="off">http://max-wik.com/</textarea>
           <span class="field-hint"><span id="char-count">0</span> chars · <span id="byte-count">0</span> UTF-8 bytes</span>
         </div>
-        <div class="field" style="max-width: 380px;">
-          <label class="field-label" for="ec-level">Error correction</label>
-          <select id="ec-level">
-            <option value="L">L · recovers ~7%</option>
-            <option value="M">M · recovers ~15%</option>
-            <option value="Q">Q · recovers ~25% (often best for tattoos)</option>
-            <option value="H" selected>H · recovers ~30% (most algorithmic recovery)</option>
-          </select>
-          <span class="field-hint">Higher level = more recovery, but bumps the version up. For tattoos, the smallest version with the highest EC that fits is usually best (the panel below suggests it).</span>
+        <div class="ec-row">
+          <div class="field" style="max-width: 380px; margin-bottom: 0;">
+            <label class="field-label" for="ec-level">Error correction</label>
+            <select id="ec-level">
+              <option value="L">L · recovers ~7%</option>
+              <option value="M">M · recovers ~15%</option>
+              <option value="Q">Q · recovers ~25% (often best for tattoos)</option>
+              <option value="H" selected>H · recovers ~30% (most algorithmic recovery)</option>
+            </select>
+            <span class="field-hint">Higher level = more recovery, but bumps the version up. For tattoos, the smallest version with the highest EC that fits is usually best (the panel below suggests it).</span>
+          </div>
+
+          <aside class="ec-primer" aria-label="Error correction primer">
+            <span class="ec-primer__tag">𓌹  EC PRIMER  𓌺</span>
+            <p>Reed-Solomon redundancy. Extra codewords are appended to the data so a partially damaged QR still decodes back to the exact input. Four standard levels:</p>
+            <dl class="ec-primer__grid">
+              <dt>L</dt><dd><span class="ec-primer__pct">~7%</span><span>clean digital displays</span></dd>
+              <dt>M</dt><dd><span class="ec-primer__pct">~15%</span><span>paper print, controlled</span></dd>
+              <dt>Q</dt><dd><span class="ec-primer__pct">~25%</span><span>outdoor wear, tattoos</span></dd>
+              <dt>H</dt><dd><span class="ec-primer__pct">~30%</span><span>heavy abuse, logo cutouts</span></dd>
+            </dl>
+            <p class="ec-primer__note">Percentages are codeword-level, not visual area. Concentrated damage usually exhausts a single block's correction budget before reaching the headline number.</p>
+          </aside>
         </div>
         <p id="error" class="error" hidden></p>
       </section>
