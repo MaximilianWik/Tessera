@@ -10,129 +10,6 @@
 </head>
 <body data-page="landing">
 
-  <!-- Background sigils: large, faded dot-art behind the content layer.
-       Hidden on mobile. Decorative only. -->
-  <div class="bg-sigils" aria-hidden="true">
-    <pre class="bg-sigil bg-sigil--tr bg-sigil--lg">
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡴⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣯⠀⢀⣠⡶⠛⠉⠙⠳⡄⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢺⣰⠟⠁⠀⠀⠀⠀⠀⠉⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡏⠀⠀⣠⠤⢤⡀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠆⠀⠸⠄⠀⠀⣿⡄⣀⡀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣳⠀⠀⠀⠀⢀⣾⣿⡇⢠⣿⠀⠀⠀
-⠀⠀⠀⣀⣠⣶⢴⡤⡶⣖⡒⡗⠛⢿⡷⣶⣾⡿⠋⠙⠿⠟⠉⠑⠒⠂
-⠀⣰⠾⠛⠋⠹⢽⣿⡦⡮⣿⡇⣤⣤⡈⢻⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⢺⠋⠀⠀⠀⠀⠀⠘⣽⣵⣫⣿⡃⡼⠇⣸⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠸⠀⠀⠀⠀⠀⠀⠀⠀⣿⡟⣿⠛⢊⡽⠿⠛⠿⣶⣦⣄⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣻⣯⡱⠁⠀⠀⠀⠀⠀⠈⢿⣧⡀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⢰⡿⠡⣟⠇⠀⠀⠀⢀⣀⡀⠀⠸⣿⡇⠀⠀⠀
-⠀⠀⠀⠈⠢⠶⠤⠞⠋⠁⢸⡏⠀⠀⢀⣿⠃⠀⠀⠀⢰⣧⠇⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣧⠀⠀⢨⡿⡀⠀⠀⣰⣿⠋⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⣿⠀⠀⠀⠙⠚⠷⠿⠟⠁⠀⠀⠀⠀⠀</pre>
-    <pre class="bg-sigil bg-sigil--tl bg-sigil--lg">
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⣤⡿⠿⣦⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⣼⠃⡀⠀⠈⣷⠀⠀⠀⠀⠀
-⠀⠀⠀⠘⠦⠃⠀⢠⡿⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⢀⣠⣶⠟⠁⠀⠀⠀⠀⠀
-⠀⠀⢀⣮⣷⠎⠁⠀⠀⢸⠀⠀⠀⠀
-⠀⠀⢸⣿⡇⠀⠀⠀⠀⢸⡀⠀⠀⠀
-⠀⠀⠸⣿⣇⠀⠀⠀⠀⢸⠇⠀⠀⠀
-⠀⠀⠀⠉⠛⢷⣦⡀⠀⣾⣧⠀⠀⠀
-⠤⠤⠤⠤⣤⣤⣤⣴⣾⣿⣭⣷⣤⠤
-⠀⠀⠀⠀⢠⣷⡏⠀⠈⢿⡟⠁⠀⠀
-⠀⠀⠀⠀⢸⣿⡇⠀⠀⢸⡇⠀⠀⠀</pre>
-    <pre class="bg-sigil bg-sigil--uml bg-sigil--xl">
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⣆⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠄⠀⠀⠀⠀⢀⡲⢷⠷⢧⣄⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⢠⠜⠁⠀⠀⠀⠀⠀⢠⣣⡓⡉⣧⠎⠋⢖⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⣰⠃⠀⠀⠀⠀⠀⠀⠀⠈⠉⢰⣻⣷⡦⠉⠁⠀⠀⠀⠀⠀
-⠀⠀⢀⣔⠦⣤⣇⠀⠀⠀⠀⠀⡆⠀⠀⠀⠀⠸⣙⣯⣡⠀⠀⡀⠀⠀⠀⠀
-⠀⠀⠈⠀⠀⢹⣧⣢⠀⠀⠀⠀⡇⠀⠀⠀⣤⠂⡟⡟⣈⡳⡀⠀⡀⠀⠀⠀
-⠀⠀⠀⠀⠛⠸⣻⡘⠀⡀⡀⣜⣇⡄⠀⠀⣧⡧⣿⣿⣿⣻⣇⠀⠄⠀⠀⠀
-⠐⠂⠐⢓⣶⢾⡿⣵⣖⡓⣒⢈⠛⣁⣞⣭⣏⣿⣿⣿⣦⣿⡕⣘⣥⡀⢠⡀</pre>
-    <pre class="bg-sigil bg-sigil--umr bg-sigil--lg">
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⣤⡿⠿⣦⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⣼⠃⡀⠀⠈⣷⠀⠀⠀⠀⠀
-⠀⠀⠀⠘⠦⠃⠀⢠⡿⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⢀⣠⣶⠟⠁⠀⠀⠀⠀⠀
-⠀⠀⢀⣮⣷⠎⠁⠀⠀⢸⠀⠀⠀⠀
-⠀⠀⢸⣿⡇⠀⠀⠀⠀⢸⡀⠀⠀⠀
-⠀⠀⠸⣿⣇⠀⠀⠀⠀⢸⠇⠀⠀⠀
-⠀⠀⠀⠉⠛⢷⣦⡀⠀⣾⣧⠀⠀⠀
-⠤⠤⠤⠤⣤⣤⣤⣴⣾⣿⣭⣷⣤⠤
-⠀⠀⠀⠀⢠⣷⡏⠀⠈⢿⡟⠁⠀⠀
-⠀⠀⠀⠀⢸⣿⡇⠀⠀⢸⡇⠀⠀⠀
-⠀⠀⠀⠀⠘⣿⡇⠀⠀⠈⡇⠀⠀⠀
-⠀⠀⠀⠀⠀⠹⣯⡄⠀⠀⠇⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠻⣷⣤⡀⠀⠀⠀</pre>
-    <pre class="bg-sigil bg-sigil--ml bg-sigil--xl">
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⣤⡿⠿⣦⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⣼⠃⡀⠀⠈⣷⠀⠀⠀⠀⠀
-⠀⠀⠀⠘⠦⠃⠀⢠⡿⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⢀⣠⣶⠟⠁⠀⠀⠀⠀⠀
-⠀⠀⢀⣮⣷⠎⠁⠀⠀⢸⠀⠀⠀⠀
-⠀⠀⢸⣿⡇⠀⠀⠀⠀⢸⡀⠀⠀⠀
-⠀⠀⠸⣿⣇⠀⠀⠀⠀⢸⠇⠀⠀⠀
-⠀⠀⠀⠉⠛⢷⣦⡀⠀⣾⣧⠀⠀⠀
-⠤⠤⠤⠤⣤⣤⣤⣴⣾⣿⣭⣷⣤⠤
-⠀⠀⠀⠀⢠⣷⡏⠀⠈⢿⡟⠁⠀⠀
-⠀⠀⠀⠀⢸⣿⡇⠀⠀⢸⡇⠀⠀⠀
-⠀⠀⠀⠀⠘⣿⡇⠀⠀⠈⡇⠀⠀⠀
-⠀⠀⠀⠀⠀⠹⣯⡄⠀⠀⠇⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠻⣷⣤⡀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣆⠀⠀</pre>
-    <pre class="bg-sigil bg-sigil--mr bg-sigil--lg">
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡴⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣯⠀⢀⣠⡶⠛⠉⠙⠳⡄⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢺⣰⠟⠁⠀⠀⠀⠀⠀⠉⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡏⠀⠀⣠⠤⢤⡀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠆⠀⠸⠄⠀⠀⣿⡄⣀⡀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣳⠀⠀⠀⠀⢀⣾⣿⡇⢠⣿⠀⠀⠀
-⠀⠀⠀⣀⣠⣶⢴⡤⡶⣖⡒⡗⠛⢿⡷⣶⣾⡿⠋⠙⠿⠟⠉⠑⠒⠂</pre>
-    <pre class="bg-sigil bg-sigil--lml bg-sigil--lg">
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣴⣆⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠄⠀⠀⠀⠀⢀⡲⢷⠷⢧⣄⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⢠⠜⠁⠀⠀⠀⠀⠀⢠⣣⡓⡉⣧⠎⠋⢖⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⣰⠃⠀⠀⠀⠀⠀⠀⠀⠈⠉⢰⣻⣷⡦⠉⠁⠀⠀⠀⠀⠀
-⠀⠀⢀⣔⠦⣤⣇⠀⠀⠀⠀⠀⡆⠀⠀⠀⠀⠸⣙⣯⣡⠀⠀⡀⠀⠀⠀⠀</pre>
-    <pre class="bg-sigil bg-sigil--lmr bg-sigil--xl">
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⣤⡿⠿⣦⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⣼⠃⡀⠀⠈⣷⠀⠀⠀⠀⠀
-⠀⠀⠀⠘⠦⠃⠀⢠⡿⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⢀⣠⣶⠟⠁⠀⠀⠀⠀⠀
-⠀⠀⢀⣮⣷⠎⠁⠀⠀⢸⠀⠀⠀⠀
-⠀⠀⢸⣿⡇⠀⠀⠀⠀⢸⡀⠀⠀⠀
-⠀⠀⠸⣿⣇⠀⠀⠀⠀⢸⠇⠀⠀⠀
-⠀⠀⠀⠉⠛⢷⣦⡀⠀⣾⣧⠀⠀⠀
-⠤⠤⠤⠤⣤⣤⣤⣴⣾⣿⣭⣷⣤⠤
-⠀⠀⠀⠀⢠⣷⡏⠀⠈⢿⡟⠁⠀⠀
-⠀⠀⠀⠀⢸⣿⡇⠀⠀⢸⡇⠀⠀⠀
-⠀⠀⠀⠀⠘⣿⡇⠀⠀⠈⡇⠀⠀⠀</pre>
-    <pre class="bg-sigil bg-sigil--bl bg-sigil--lg">
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡴⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣯⠀⢀⣠⡶⠛⠉⠙⠳⡄⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢺⣰⠟⠁⠀⠀⠀⠀⠀⠉⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡏⠀⠀⣠⠤⢤⡀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠆⠀⠸⠄⠀⠀⣿⡄⣀⡀⠀⠀⠀⠀</pre>
-    <pre class="bg-sigil bg-sigil--br bg-sigil--lg">
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⣤⡿⠿⣦⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⣼⠃⡀⠀⠈⣷⠀⠀⠀⠀⠀
-⠀⠀⠀⠘⠦⠃⠀⢠⡿⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⢀⣠⣶⠟⠁⠀⠀⠀⠀⠀
-⠀⠀⢀⣮⣷⠎⠁⠀⠀⢸⠀⠀⠀⠀
-⠀⠀⢸⣿⡇⠀⠀⠀⠀⢸⡀⠀⠀⠀
-⠀⠀⠸⣿⣇⠀⠀⠀⠀⢸⠇⠀⠀⠀
-⠀⠀⠀⠉⠛⢷⣦⡀⠀⣾⣧⠀⠀⠀</pre>
-  </div>
-
   <header class="site-header">
     <div class="site-header__inner">
       <div class="brand">
@@ -262,7 +139,7 @@
           <h3><span class="num">IV.</span> &nbsp; Damage preview · blur (tattoo aging)</h3>
           <span id="damage-verdict" class="damage__verdict" data-state="idle">·</span>
         </div>
-        <p class="panel__hint">Real tattoos fail through gradual ink bleed. This applies a gaussian blur to the QR at the chosen severity and re-decodes. The tolerance log on the right runs every level on load and tells you the highest blur the QR survives unaided.</p>
+        <p class="panel__hint">Real tattoos fail through gradual ink bleed. This applies a Gaussian blur to the QR at the chosen severity and re-decodes. The tolerance log on the right runs every level on load and tells you the highest blur the QR survives unaided.</p>
         <div class="damage">
           <div class="damage__canvas-col">
             <div id="damage-canvas-wrap" class="damage__canvas-wrap" hidden>
@@ -302,7 +179,7 @@
           <h3><span class="num">V.</span> &nbsp; Tattoo specs</h3>
           <span id="tattoo-status" class="muted small">awaiting input</span>
         </div>
-        <p class="panel__hint">Module size determines whether your phone can read the tattoo, and how durable it is to skin stretch and ink bleed. Show the artist the exact size you want.</p>
+        <p class="panel__hint">Module size determines whether your phone can read the tattoo, and how well it withstands skin stretch and ink bleed. Show the artist the exact size you want.</p>
         <div id="tattoo-recs"></div>
       </section>
 
@@ -312,7 +189,7 @@
           <h3><span class="num">VI.</span> &nbsp; Export</h3>
           <span class="muted small">locks until verified</span>
         </div>
-        <p class="panel__hint">PNG for the artist's screen. SVG for any size (recommended for tattoo). Spec sheet for the archive (print and file with important documents).</p>
+        <p class="panel__hint">PNG for the artist's screen. SVG for any size (recommended for tattoos). Spec sheet for the archive (print and file with important documents).</p>
         <div class="button-row">
           <button id="btn-png" type="button" class="btn">PNG</button>
           <button id="btn-svg" type="button" class="btn">SVG</button>

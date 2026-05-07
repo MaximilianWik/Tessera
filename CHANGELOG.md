@@ -9,6 +9,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 2026-05-07
 
+#### Run 13: background sigils removed entirely; full grammar/spelling sweep across site and docs
+
+The bg-sigils experiment (introduced and bumped through runs 10–12, briefly extended to a 7-slot continuous coverage pattern in the prior unsaved session) didn't land aesthetically. This run pulls them out completely and uses the moment to do a top-to-bottom prose pass across every user-facing page and the two `docs/` files, fixing both lint-grade nits and one substantive content drift: the README and `docs/PERMANENCE.md` were still describing the old square-blot damage model even though the actual code, the live preview, and `permanence.html` had all migrated to the Gaussian-blur model in run 6+.
+
+Removed:
+
+- **`<div class="bg-sigils">`** blocks from `index.html` (10 staggered braille-art pieces), `permanence.html` (4 pieces), and `tests.html` (2 pieces). The decorative `<pre class="hero__sigil">` art inside each hero panel stays — those are the focal sigils, not the background fill.
+- All `.bg-sigils` / `.bg-sigil` / `.bg-sigil--{tl,tr,uml,umr,ml,mr,lml,lmr,bl,br}` / `.bg-sigil--lg` / `.bg-sigil--xl` / `[data-page=…] .bg-sigil--…` rules from `styles.css` (~65 lines), plus the `position: relative; z-index: 1;` block on header/hero/shell/etc. that only existed to layer content above the sigils, and the `@media (max-width: 720px) { .bg-sigils { display: none; } }` mobile guard.
+- The translucent panel treatment introduced for sigil bleed-through: `.panel` reverts to `background: var(--ink-1)` with no `backdrop-filter`, matching its pre-run-10 appearance.
+
+Fixed (grammar / spelling / consistency):
+
+- **`gaussian` → `Gaussian`** (proper noun) on `index.html` panel hint and twice in `permanence.html` Layer IV.
+- **`watercolour` → `watercolor`** (`permanence.html` Layer IV) and **`same-colour`/`same colour` → `same-color`/`same color`** (`docs/SPEC.md` mask-scoring section). Project prose otherwise uses American spelling (defense, behavior, neighbors, center) so these were the outliers.
+- **`how durable it is to skin stretch and ink bleed` → `how well it withstands skin stretch and ink bleed`** on `index.html` tattoo-specs panel ("durable to" is not idiomatic).
+- **`recommended for tattoo` → `recommended for tattoos`** on the index export-panel hint.
+- **`fewer modules wins` → `fewer modules win`** in the `permanence.html` Layer IV pull-quote (subject-verb agreement; "modules" is plural). Same fix applied to the rewritten Layer 4 of `docs/PERMANENCE.md`.
+- **Missing comma before non-restrictive `which`**: `(about 0.3 mm dots) which puts a hard floor` → `(about 0.3 mm dots), which puts a hard floor` in the same pull-quote (and PERMANENCE.md mirror).
+- **`blur covering far less than 10%` → `blur levels far less than 10%`**, and **`survive normal aging on properly sized ink` → `survive normal aging at sensible module sizes`** in the same Layer IV / Layer 4 paragraph (the original phrasing was ambiguous; "ink" wasn't the right thing to size).
+- **README intro comma-spliced clause** → em-dashes: `Designed for one specific use case, generating a QR code…, but useful for anyone…` → `Designed for one specific use case — generating a QR code… — but useful for anyone…`.
+
+Fixed (substantive content drift — the docs were stale relative to the code):
+
+- **`docs/PERMANENCE.md` Layer 4** rewritten end-to-end. The old version described a randomized clustered-blot model with 5 trials per level and a hand-wavy explanation of why 5% is the floor that doesn't match the actual implementation. The new version mirrors the `permanence.html` Layer IV section: Gaussian blur, deterministic single trial per level (because blur has no random variable to average over), the actual `(severity / 100) × moduleSize × 3` calibration formula, the seven sweep levels, and the Why-finders-aren't-damaged + Why-fewer-modules-win pull-quotes.
+- **README.md Layer 4 paragraph** rewritten to match: `overlaying a random square "blot" covering 5 to 30% of the module area` → `applying a Gaussian blur at radii from 5% up to 30% of a module width`. The "5% clustered damage tolerated reliably" headline becomes "5% blur tolerated reliably". Same fix for the bullet under "the tests include" further down.
+- **The "honest claim" blockquote** (appears verbatim in `README.md`, `permanence.html`, and `docs/PERMANENCE.md`) had `damage-tolerant in a clustered-blot stress test` → `damage-tolerant under a Gaussian-blur stress test` in all three places.
+- **`permanence.html` Layer IV calibration line** had a wrong formula: `radius = (severity / 100) × moduleSize × 0.5` → `× 3`, with the "5% ≈ one-tenth of a module / 30% ≈ half a module" descriptive claim corrected to `5% ≈ one-sixth of a module / 30% ≈ nearly a full module`. The actual code in `src/damage-preview.js:69` uses `* 3`, which lands 30% at ~0.9 modules of blur (matching the "nearly a full module" comment in the source), so the doctrine page was off by 6× on the multiplier.
+
+Verified:
+
+- **93/93 tests still green** (headless Chromium via Playwright, `node tools/ci-run-tests.mjs`).
+- HTML structure intact across all three pages (no orphan tags after the bg-sigils block removal — verified with a tag-balance check).
+- No remaining `bg-sigil` references in `index.html`, `permanence.html`, `tests.html`, or `styles.css`.
+- No remaining lowercase `gaussian` in user-facing prose.
+- No remaining British-spelling outliers in user-facing prose (CHANGELOG entries left alone — historical record).
+- The two surviving "blot" mentions in `permanence.html`/`docs/PERMANENCE.md` are intentional and contrastive: the sentence "Tattoos don't fail through hard 'blot' cover-ups" sets up the blur model. The README's "not through random module flips or hard blots" plays the same role.
+- The pre-existing `backdrop-filter: blur(8px)` on `.site-header` is unrelated to the sigil work and stays — it's the sticky-header glass effect.
+
+Notes / context:
+
+- The bg-sigils were attempting to add atmospheric depth around the centred shell but ended up reading as visual noise that fought the panel content for attention rather than complementing it. The hero `<pre class="hero__sigil">` art per page already does the sigilism work; the page edges work better empty.
+- "Verify every post" caught a real bug in the doctrine page math (the 0.5 vs. 3 multiplier on the blur formula). The README and `docs/PERMANENCE.md` Layer-4 staleness was the bigger issue — those would have been actively misleading to anyone auditing the project off the GitHub README, and the "what the project doesn't claim" blockquote was contradicting itself between the run-6+ blur model and the run-pre-6 blot prose. All three locations of that blockquote now agree.
+
 #### Run 12: "About the name" section ported into the permanence page (with the Hagia Sophia mosaic)
 
 The README's "About the name" section explains why Tessera is called Tessera: a tessera is the small stone or glass tile a mosaic is built from, and a QR code is a mosaic. The Hagia Sophia detail image grounds the metaphor visually. That context lived in the README only; the live site never showed it. This run promotes it onto the permanence page, where the historical anchor sits well between "The premise" and Layer I, pivoting from the technical stakes to the conceptual frame before the doctrine begins.

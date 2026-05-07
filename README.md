@@ -2,7 +2,7 @@
 
 > Permanent tiles for a permanent mark.
 
-A web-based QR code generator built for **permanence**. Designed for one specific use case, generating a QR code that will be tattooed and must work for life, but useful for anyone who wants verifiably correct, archival-grade QR codes.
+A web-based QR code generator built for **permanence**. Designed for one specific use case — generating a QR code that will be tattooed and must work for life — but useful for anyone who wants verifiably correct, archival-grade QR codes.
 
 **Live at <https://tessera-neon.vercel.app/>** · **Source: <https://github.com/MaximilianWik/Tessera>** · **Test page: <https://tessera-neon.vercel.app/tests.html>**
 
@@ -39,7 +39,7 @@ Correctness is treated as a multi-layered problem. Every layer must independentl
 
    Verification passes iff at least 1 decoder successfully decoded the QR AND every decoder that succeeded returned the exact original input text. (A decoder *silently returning wrong text* fails verification immediately. That's the dangerous failure mode.) The UI shows a "redundancy level" indicating how many decoders independently agreed.
 
-4. **Damage tolerance simulation.** Each QR is stress-tested by overlaying a random square "blot" covering 5 to 30% of the module area and re-decoding. (Clustered damage, not random module flips; see [docs/PERMANENCE.md](docs/PERMANENCE.md) for why this matches real-world failure modes.) The empirical permanence bar is **5% clustered damage tolerated reliably**; larger QRs typically tolerate considerably more, and your QR's actual measured tolerance is shown in the UI and printed on the spec sheet.
+4. **Damage tolerance simulation.** Each QR is stress-tested by applying a Gaussian blur at radii from 5% up to 30% of a module width, then re-decoded at every level. (Real tattoos fail through gradual ink bleed and edge softening, not through random module flips or hard blots; see [docs/PERMANENCE.md](docs/PERMANENCE.md) for the calibration.) The empirical permanence bar is **5% blur tolerated reliably**; larger QRs typically tolerate considerably more, and your QR's actual measured tolerance is shown in the UI and printed on the spec sheet.
 
 5. **Multi-format archival output.** The generator produces a printable **specification sheet** containing the QR at multiple physical sizes, the encoded URL in plain text, version/EC/mask metadata, generation timestamp, the **full module matrix as ASCII art and hex dump** (so the QR can be reconstructed by hand from a printed copy if all digital files are lost), SHA-256 of the source code that generated it, round-trip results, and reproduction instructions.
 
@@ -80,7 +80,7 @@ The tests include:
 
 - **ISO/IEC 18004 Annex I worked example**: must match the spec's published expected output bit-for-bit.
 - **Internal consistency**: encoder output passes its own round-trip decode through every available decoder.
-- **Damage tolerance**: encoder output decodes correctly with up to 5% clustered damage (the empirical floor across QR sizes; larger QRs tolerate considerably more).
+- **Damage tolerance**: encoder output decodes correctly at up to 5% Gaussian blur (the empirical floor across QR sizes; larger QRs tolerate considerably more).
 - **Edge cases**: empty input rejection, URL boundary cases, all-numeric, all-alphanumeric, bytes/UTF-8.
 
 ## Deployment
@@ -124,7 +124,7 @@ tessera/
 ## What Tessera does NOT claim
 
 - It does **not** claim "100% guaranteed forever." Nothing is.
-- It claims: *verified correct against the ISO spec's own test vectors, round-trip-tested by up to three independent decoders (with the redundancy level recorded), damage-tolerant in a clustered-blot stress test (with the actual measured tolerance recorded for every QR), and open-source auditable.* That's the strongest honest claim possible. It's stronger than any commercial QR generator offers.
+- It claims: *verified correct against the ISO spec's own test vectors, round-trip-tested by up to three independent decoders (with the redundancy level recorded), damage-tolerant under a Gaussian-blur stress test (with the actual measured tolerance recorded for every QR), and open-source auditable.* That's the strongest honest claim possible. It's stronger than any commercial QR generator offers.
 
 ## License
 

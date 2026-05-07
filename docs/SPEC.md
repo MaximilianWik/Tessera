@@ -80,7 +80,7 @@ Working from the bottom-right, snake upward in 2-column zig-zags, skipping the t
 
 There are 8 standard mask patterns. Each mask XORs a regular geometric pattern with the data area only; function patterns are never masked.
 
-For each mask, the encoder computes a *penalty score* based on four heuristics (long runs of same-colour modules, 2×2 blocks of same colour, finder-pattern lookalikes, dark/light imbalance). The mask with the **lowest** penalty wins.
+For each mask, the encoder computes a *penalty score* based on four heuristics (long runs of same-color modules, 2×2 blocks of same color, finder-pattern lookalikes, dark/light imbalance). The mask with the **lowest** penalty wins.
 
 ### 9. Write format and version info
 
