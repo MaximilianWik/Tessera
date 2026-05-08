@@ -412,6 +412,91 @@ strong, b { font-weight: 700; color: var(--bone-0); }
   color: var(--bone-3);
   letter-spacing: 0.02em;
 }
+
+/* -- EC ROW (error-correction dropdown + primer side panel) ---------------- */
+
+.ec-row {
+  display: grid;
+  grid-template-columns: minmax(0, 380px) 1fr;
+  gap: 28px;
+  align-items: start;
+  margin: 0 0 18px;
+}
+
+.ec-primer {
+  border: var(--rule) solid var(--ink-5);
+  background: linear-gradient(180deg, rgba(196, 30, 38, 0.05), rgba(0, 0, 0, 0) 60%);
+  padding: 14px 16px 12px;
+  position: relative;
+}
+.ec-primer::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--blood-1);
+  opacity: 0.6;
+}
+.ec-primer__tag {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  color: var(--blood-1);
+  font-weight: 700;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+.ec-primer p {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--bone-2);
+}
+.ec-primer__grid {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 4px 12px;
+  margin: 0 0 10px;
+  padding: 8px 0;
+  border-top: var(--rule) solid var(--ink-5);
+  border-bottom: var(--rule) solid var(--ink-5);
+}
+.ec-primer__grid dt {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--blood-1);
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+}
+.ec-primer__grid dd {
+  margin: 0;
+  font-size: 12px;
+  color: var(--bone-2);
+  line-height: 1.5;
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 8px;
+  align-items: baseline;
+}
+.ec-primer__pct {
+  font-variant-numeric: tabular-nums;
+  color: var(--bone-1);
+  font-weight: 600;
+}
+.ec-primer__note {
+  font-size: 10.5px !important;
+  color: var(--bone-3) !important;
+  margin: 0 !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.01em;
+}
+
+@media (max-width: 920px) {
+  .ec-row {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
 textarea, select, input[type="text"], input[type="number"] {
   background: var(--ink-0);
   color: var(--bone-1);
